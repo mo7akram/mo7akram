@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>يلا لايف | تجربة صوتية احترافية</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  :root {
+    --bg-dark: #0a0c15;
+    --bg-card: rgba(18, 25, 45, 0.7);
+    --border-glow: rgba(59, 130, 246, 0.3);
+    --primary: #3b82f6;
+    --primary-dark: #2563eb;
+    --success: #10b981;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+    --glass-edge: rgba(255, 255, 255, 0.05);
+    --text-light: #f1f5f9;
+    --text-muted: #94a3b8;
+    --grad-1: linear-gradient(135deg, #0f172a, #0a0f1f);
+    --shadow-strong: 0 20px 35px -12px rgba(0, 0, 0, 0.5);
+    --gold: #fbbf24;
+    --silver: #cbd5e1;
+    --bronze: #cd7f56;
+    --card-bg: rgba(15, 25, 45, 0.6);
+  }
+  body { background: var(--grad-1); color: var(--text-light); font-family: 'Cairo', sans-serif; min-height: 100vh; padding-bottom: 60px; scroll-behavior: smooth; }
+  /* ===== شاشات المصادقة ===== */
+  .auth-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--grad-1); backdrop-filter: blur(12px); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; transition: 0.3s; }
+  .auth-card { background: rgba(20, 30, 55, 0.9); backdrop-filter: blur(20px); border-radius: 48px; padding: 30px 24px; width: 100%; max-width: 400px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 25px 45px rgba(0,0,0,0.4); text-align: center; }
+  .auth-card h2 { font-size: 32px; margin-bottom: 20px; background: linear-gradient(135deg, #fff, #94a3f8); background-clip: text; -webkit-background-clip: text; color: transparent; }
+  .auth-input { width: 100%; padding: 14px 18px; margin: 12px 0; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); border-radius: 60px; color: white; font-size: 16px; outline: none; font-family: 'Cairo', sans-serif; }
+  .auth-input:focus { border-color: var(--primary); background: rgba(59,130,246,0.1); }
+  .auth-btn { width: 100%; background: linear-gradient(125deg, #3b82f6, #6366f1); border: none; padding: 12px; border-radius: 60px; font-weight: bold; font-size: 18px; margin: 12px 0; cursor: pointer; color: white; }
+  .auth-switch { color: var(--text-muted); margin-top: 15px; font-size: 14px; }
+  .auth-switch span { color: var(--primary); cursor: pointer; font-weight: bold; }
+  .error-msg { color: #f87171; font-size: 13px; margin: 5px 0; }
+  /* شاشة إكمال الملف الشخصي */
+  .profile-completion { max-height: 90vh; overflow-y: auto; padding: 10px; }
+  .avatar-grid { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin: 15px 0; }
+  .avatar-option { font-size: 42px; cursor: pointer; padding: 8px; border-radius: 60px; background: rgba(255,255,255,0.1); transition: 0.2s; width: 70px; text-align: center; }
+  .avatar-option.selected { background: var(--primary); transform: scale(1.1); box-shadow: 0 0 10px rgba(59,130,246,0.5); }
+  .country-select { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.08); border-radius: 60px; padding: 8px 15px; margin: 12px 0; }
+  .country-select select { background: transparent; border: none; color: white; font-size: 16px; flex: 1; outline: none; font-family: 'Cairo', sans-serif; }
+  .country-flag { font-size: 28px; }
+  .gender-icons { display: flex; gap: 20px; justify-content: center; margin: 15px 0; }
+  .gender-option { font-size: 32px; cursor: pointer; padding: 8px 20px; border-radius: 60px; background: rgba(255,255,255,0.1); transition: 0.2s; }
+  .gender-option.selected { background: var(--primary); box-shadow: 0 0 10px rgba(59,130,246,0.5); }
+  textarea { width: 100%; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); border-radius: 28px; padding: 12px; color: white; font-family: 'Cairo', sans-serif; resize: vertical; margin: 12px 0; }
+  .date-input { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); border-radius: 60px; padding: 12px; color: white; width: 100%; margin: 12px 0; }
+  /* تصميم جديد للشريط العلوي */
+  .top-bar { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: rgba(10, 12, 21, 0.8); backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 100; gap: 12px; flex-wrap: wrap; }
+  .top-icons { display: flex; gap: 12px; align-items: center; }
+  .icon-btn { background: rgba(255,255,255,0.08); border: none; border-radius: 50%; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; font-size: 22px; cursor: pointer; transition: 0.2s; color: var(--text-light); }
+  .icon-btn:hover { background: rgba(59,130,246,0.3); transform: scale(1.05); }
+  .tabs { display: flex; gap: 8px; overflow-x: auto; padding: 4px 0; flex: 1; scrollbar-width: thin; }
+  .tab { padding: 6px 14px; background: rgba(255,255,255,0.04); border-radius: 40px; cursor: pointer; white-space: nowrap; transition: 0.25s; font-weight: 500; font-size: 13px; border: 1px solid rgba(255,255,255,0.08); }
+  .tab.active { background: linear-gradient(125deg, #3b82f6, #6366f1); border-color: transparent; box-shadow: 0 5px 12px rgba(59,130,246,0.4); }
+  /* شريط البحث المنبثق */
+  .search-overlay { position: fixed; top: 0; left: 0; right: 0; background: rgba(10,12,21,0.95); backdrop-filter: blur(12px); z-index: 200; padding: 16px; display: none; flex-direction: column; gap: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+  .search-overlay input { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); border-radius: 60px; padding: 12px 18px; color: white; font-size: 16px; outline: none; width: 100%; }
+  .search-overlay .close-search { background: var(--danger); border: none; padding: 8px; border-radius: 40px; color: white; font-weight: bold; cursor: pointer; }
+  .banner { height: 180px; margin: 8px 12px 12px 12px; border-radius: 28px; overflow: hidden; box-shadow: var(--shadow-strong); }
+  .slider { display: flex; width: 300%; transition: transform 0.5s cubic-bezier(0.2, 0.9, 0.4, 1.1); height: 100%; }
+  .slide { width: 100%; display: flex; justify-content: center; align-items: center; font-size: 26px; font-weight: 800; text-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+  .s1 { background: linear-gradient(145deg, #1e3a8a, #3b82f6); }
+  .s2 { background: linear-gradient(145deg, #065f46, #10b981); }
+  .s3 { background: linear-gradient(145deg, #581c87, #a855f7); }
+  .rooms { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; padding: 12px 16px 20px 16px; }
+  /* كارت الغرفة الجديد - مربع */
+  .card {
+    background: linear-gradient(145deg, rgba(20,30,55,0.7), rgba(15,23,42,0.8));
+    backdrop-filter: blur(12px);
+    border-radius: 28px;
+    cursor: pointer;
+    transition: 0.3s;
+    border: 1px solid rgba(255,255,255,0.08);
+    position: relative;
+    aspect-ratio: 1 / 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    overflow: hidden;
+  }
+  .card:hover { transform: translateY(-6px) scale(1.02); border-color: rgba(59,130,246,0.5); }
+  .room-avatar-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 120px;
+    opacity: 0.8;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .room-footer {
+    position: relative;
+    z-index: 2;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(8px);
+    padding: 8px 10px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    text-align: center;
+    width: 100%;
+  }
+  .room-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: white;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 4px;
+  }
+  .room-stats {
+    font-size: 10px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+  }
+  .online-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background-color: #10b981;
+    border-radius: 50%;
+    margin-left: 4px;
+    box-shadow: 0 0 4px #10b981;
+  }
+  .room-country {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 10px;
+    background: rgba(0,0,0,0.5);
+    padding: 2px 6px;
+    border-radius: 20px;
+  }
+  .room-id-small {
+    font-size: 9px;
+    font-family: monospace;
+    color: var(--text-muted);
+    margin-top: 3px;
+  }
+  .join-icon {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    background: rgba(255,215,0,0.2);
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: 0.2s;
+    z-index: 10;
+  }
+  .join-icon:hover { background: rgba(59,130,246,0.5); transform: scale(1.1); }
+  /* شريط أعلام التصنيف في تبويب الشائعة */
+  .flags-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 8px 16px;
+    margin: 0 0 10px 0;
+    background: rgba(0,0,0,0.3);
+    border-radius: 40px;
+    justify-content: center;
+  }
+  .flag-filter-btn {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 60px;
+    padding: 5px 12px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .flag-filter-btn.active {
+    background: linear-gradient(125deg, #3b82f6, #6366f1);
+    border-color: transparent;
+    box-shadow: 0 2px 8px rgba(59,130,246,0.3);
+  }
+  .flag-filter-btn:hover { transform: translateY(-2px); background: rgba(59,130,246,0.3); }
+  /* باقي الأنماط كما هي */
+  .room { display: none; padding: 16px 12px 20px; animation: fadeSlideUp 0.4s ease; background: transparent; }
+  @keyframes fadeSlideUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+  .room-header { display: flex; flex-direction: column; align-items: flex-start; margin-bottom: 20px; gap: 8px; }
+  .room-title-row { display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 12px; }
+  .room-name { font-size: 24px; font-weight: 800; background: linear-gradient(135deg, #fff, #94a3f8); background-clip: text; -webkit-background-clip: text; color: transparent; display: flex; align-items: center; gap: 12px; }
+  .room-avatar { font-size: 40px; }
+  .room-id { background: rgba(255,255,255,0.1); padding: 6px 12px; border-radius: 40px; font-size: 14px; font-family: monospace; }
+  .room-bio { background: rgba(255,255,255,0.08); border-radius: 28px; padding: 10px 16px; font-size: 13px; color: var(--text-muted); }
+  .participants-count { background: rgba(255,255,255,0.1); padding: 6px 16px; border-radius: 60px; font-size: 14px; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; }
+  .participants-count:hover { background: rgba(59,130,246,0.3); transform: scale(1.02); }
+  .members-icon { background: rgba(255,215,0,0.2); border-radius: 50%; width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; }
+  .members-icon:hover { background: rgba(59,130,246,0.5); }
+  .mics-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 16px; margin-bottom: 24px; max-height: 45vh; overflow-y: auto; padding: 6px; }
+  .mic-card { background: rgba(20, 30, 55, 0.7); backdrop-filter: blur(12px); border-radius: 32px; padding: 14px 8px; text-align: center; border: 1px solid rgba(255,255,255,0.1); transition: 0.2s; position: relative; }
+  .mic-card.speaking { border-color: var(--primary); box-shadow: 0 0 12px rgba(59,130,246,0.6); animation: pulse 1s infinite; }
+  @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(59,130,246,0.4); } 70% { box-shadow: 0 0 0 8px rgba(59,130,246,0); } 100% { box-shadow: 0 0 0 0 rgba(59,130,246,0); } }
+  .mic-avatar { font-size: 48px; margin-bottom: 6px; }
+  .mic-name { font-weight: 700; font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 5px; }
+  .host-badge { background: var(--gold); color: #000; font-size: 10px; padding: 2px 8px; border-radius: 40px; font-weight: bold; }
+  .member-badge { background: var(--primary); color: white; font-size: 10px; padding: 2px 8px; border-radius: 40px; font-weight: bold; }
+  .mic-actions { display: flex; gap: 6px; justify-content: center; margin-top: 8px; }
+  .mic-btn { background: rgba(255,255,255,0.1); border: none; padding: 5px 10px; border-radius: 40px; font-size: 12px; cursor: pointer; transition: 0.2s; color: white; }
+  .mic-btn.gift { background: var(--warning); color: #000; }
+  .mic-btn.accept { background: var(--success); }
+  .mic-btn.remove { background: var(--danger); }
+  .raised-hand-badge { position: absolute; top: -8px; right: -8px; background: var(--warning); border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 14px; border: 2px solid white; }
+  .room-controls { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-bottom: 20px; }
+  .ctrl-btn { background: rgba(30,41,59,0.8); border: none; padding: 10px 20px; border-radius: 60px; font-weight: bold; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; transition: 0.2s; color: white; }
+  .ctrl-btn.primary { background: linear-gradient(125deg, #3b82f6, #6366f1); }
+  .ctrl-btn.danger { background: linear-gradient(125deg, #ef4444, #dc2626); }
+  .ctrl-btn.warning { background: linear-gradient(125deg, #f59e0b, #d97706); }
+  .chat-area { background: rgba(0,0,0,0.35); backdrop-filter: blur(8px); border-radius: 32px; padding: 12px; margin-top: 16px; border: 1px solid rgba(255,255,255,0.08); }
+  .chat-messages { height: 180px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+  .message { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; word-break: break-word; }
+  .message-avatar { font-size: 28px; }
+  .message-bubble { background: rgba(255,255,255,0.05); padding: 8px 12px; border-radius: 20px; max-width: 85%; }
+  .message-user { font-weight: bold; color: var(--primary); margin-left: 5px; }
+  .message-gift { background: rgba(245,158,11,0.2); border-right: 3px solid var(--warning); }
+  .chat-input { display: flex; gap: 10px; align-items: center; }
+  .chat-input input { flex: 1; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 60px; padding: 12px 18px; color: white; outline: none; }
+  .chat-input button { background: var(--primary); padding: 0 20px; border-radius: 60px; border: none; font-weight: bold; }
+  .gift-icon-btn { background: rgba(255,215,0,0.2); border: none; border-radius: 50%; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; font-size: 22px; cursor: pointer; transition: 0.2s; color: var(--gold); }
+  .gift-icon-btn:hover { background: rgba(255,215,0,0.5); transform: scale(1.05); }
+  .gift-animation { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 80px; z-index: 3000; animation: giftFloat 1s ease-out forwards; pointer-events: none; text-shadow: 0 0 20px gold; }
+  @keyframes giftFloat { 0% { opacity: 1; transform: translate(-50%, -50%) scale(0.5); } 50% { opacity: 1; transform: translate(-50%, -50%) scale(1.5); } 100% { opacity: 0; transform: translate(-50%, -100%) scale(0.8); } }
+  /* ملف شخصي */
+  .profile-container { max-width: 550px; margin: 16px auto; padding: 0 16px; display: flex; flex-direction: column; gap: 20px; }
+  .profile-card { background: rgba(20,30,55,0.7); backdrop-filter: blur(12px); border-radius: 40px; padding: 24px 20px; border: 1px solid rgba(255,255,255,0.1); position: relative; }
+  .personal-card { text-align: center; position: relative; }
+  .settings-icon { position: absolute; top: 15px; left: 15px; background: rgba(255,255,255,0.1); border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: pointer; transition: 0.2s; z-index: 10; }
+  .settings-icon:hover { background: rgba(59,130,246,0.5); transform: rotate(15deg); }
+  .logout-icon { position: absolute; top: 15px; right: 15px; background: rgba(255,255,255,0.1); border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: pointer; transition: 0.2s; z-index: 10; }
+  .logout-icon:hover { background: rgba(239,68,68,0.5); transform: scale(1.05); }
+  .profile-avatar-center { display: flex; justify-content: center; margin-bottom: 20px; position: relative; }
+  .avatar-large { width: 110px; height: 110px; background: linear-gradient(145deg, #1e2a47, #0f172a); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 64px; border: 4px solid rgba(59,130,246,0.6); cursor: default; }
+  .profile-username { font-size: 26px; font-weight: 800; background: linear-gradient(135deg, #fff, #94a3f8); background-clip: text; -webkit-background-clip: text; color: transparent; }
+  .profile-userid { font-size: 13px; color: var(--text-muted); background: rgba(255,255,255,0.1); display: inline-block; padding: 4px 12px; border-radius: 40px; margin-top: 6px; font-family: monospace; }
+  .profile-bio { background: rgba(255,255,255,0.05); padding: 12px 16px; border-radius: 28px; margin: 16px 0; font-size: 14px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .personal-info { background: rgba(255,255,255,0.05); border-radius: 28px; padding: 14px; margin-top: 16px; display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+  .info-item { display: flex; align-items: center; gap: 8px; font-size: 13px; background: rgba(255,255,255,0.03); padding: 6px 12px; border-radius: 40px; }
+  .info-item i { font-size: 14px; color: var(--primary); }
+  .info-email { flex: 1 1 100%; justify-content: center; background: rgba(59,130,246,0.1); }
+  .stats-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 12px; margin-bottom: 24px; }
+  .stat-card { background: rgba(255,255,255,0.05); border-radius: 28px; padding: 14px 10px; text-align: center; transition: 0.2s; }
+  .stat-card i { font-size: 24px; color: var(--primary); margin-bottom: 6px; display: block; }
+  .stat-value { font-size: 20px; font-weight: 800; margin: 4px 0; }
+  .stat-label { font-size: 11px; color: var(--text-muted); }
+  .action-buttons-profile { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 8px; }
+  .btn-profile { padding: 10px 20px; border-radius: 60px; font-weight: 600; font-size: 14px; flex: 1; min-width: 130px; justify-content: center; border: none; cursor: pointer; color: white; }
+  .btn-edit { background: linear-gradient(125deg, #3b82f6, #6366f1); }
+  .btn-recharge { background: linear-gradient(125deg, #f59e0b, #d97706); }
+  .btn-home { background: rgba(30,41,59,0.8); }
+  /* مودالات */
+  .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 2000; align-items: center; justify-content: center; }
+  .modal-content { background: rgba(20,30,55,0.95); border-radius: 48px; padding: 25px; max-width: 450px; width: 90%; max-height: 85vh; overflow-y: auto; text-align: center; border: 1px solid rgba(255,215,0,0.3); }
+  .packages-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px,1fr)); gap: 16px; margin: 20px 0; }
+  .package-card { background: rgba(255,255,255,0.07); border-radius: 28px; padding: 15px 10px; border: 1px solid rgba(255,215,0,0.3); cursor: pointer; transition: 0.2s; }
+  .package-card:hover { background: rgba(255,215,0,0.2); transform: translateY(-3px); }
+  .package-price { font-size: 22px; font-weight: 800; color: #facc15; }
+  .close-modal { background: var(--primary); margin-top: 15px; width: 100%; }
+  .participants-modal { max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; text-align: right; }
+  .participant-item { display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.05); border-radius: 28px; padding: 12px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.1); }
+  .participant-avatar { font-size: 48px; }
+  .participant-info { flex: 1; }
+  .participant-name { font-weight: bold; font-size: 18px; display: flex; align-items: center; gap: 8px; }
+  .participant-id { font-size: 11px; background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 40px; font-family: monospace; }
+  .participant-actions { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+  .gift-modal-box { max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; text-align: center; }
+  .balance-display { margin: 10px 0; padding: 10px; background: rgba(255,215,0,0.1); border-radius: 28px; font-size: 16px; }
+  .gift-items { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 20px 0; }
+  .gift-item { background: rgba(255,255,255,0.07); border-radius: 28px; padding: 12px; cursor: pointer; transition: 0.2s; border: 1px solid rgba(255,215,0,0.3); }
+  .gift-item:hover { background: rgba(255,215,0,0.2); transform: translateY(-3px); }
+  .gift-icon { font-size: 48px; margin-bottom: 8px; }
+  .gift-price { font-size: 14px; color: var(--gold); font-weight: bold; }
+  .recipient-select { margin: 15px 0; background: rgba(255,255,255,0.08); border-radius: 60px; padding: 8px; }
+  .recipient-select select { width: 100%; background: transparent; border: none; color: white; font-size: 16px; padding: 8px; outline: none; }
+  /* لوحة المتصدرين */
+  #leaderboardView { padding: 20px 16px 40px; animation: fadeSlideUp 0.3s ease; }
+  .leaderboard-header { text-align: center; margin-bottom: 24px; }
+  .leaderboard-tabs { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 20px; }
+  .lb-tab { padding: 8px 16px; background: rgba(255,255,255,0.04); border-radius: 40px; cursor: pointer; white-space: nowrap; font-weight: 600; border: 1px solid rgba(255,255,255,0.1); transition: 0.2s; }
+  .lb-tab.active { background: linear-gradient(125deg, #3b82f6, #6366f1); color: white; border-color: transparent; }
+  .leaderboard-list { display: flex; flex-direction: column; gap: 14px; }
+  .leaderboard-item { background: rgba(255,255,255,0.05); backdrop-filter: blur(12px); border-radius: 28px; padding: 12px 18px; display: flex; align-items: center; gap: 14px; border: 1px solid rgba(255,255,255,0.1); transition: 0.2s; }
+  .rank-icon { width: 48px; text-align: center; font-size: 28px; font-weight: 800; }
+  .rank-1 { color: var(--gold); text-shadow: 0 0 5px rgba(251,191,36,0.5); }
+  .rank-2 { color: var(--silver); }
+  .rank-3 { color: var(--bronze); }
+  .user-avatar { width: 52px; height: 52px; background: rgba(255,255,255,0.15); border-radius: 60px; display: flex; align-items: center; justify-content: center; font-size: 32px; }
+  .user-info { flex: 1; }
+  .user-name { font-weight: 800; font-size: 18px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .user-id-leaderboard { font-size: 11px; background: rgba(255,255,255,0.15); padding: 2px 8px; border-radius: 40px; color: var(--text-muted); font-family: monospace; }
+  .user-points { font-size: 13px; color: #facc15; margin-top: 5px; }
+  /* الشريط السفلي */
+  .bottom-nav { position: fixed; bottom: 0; width: 100%; background: rgba(8,10,20,0.85); backdrop-filter: blur(20px); display: flex; justify-content: space-around; padding: 8px 20px; border-top: 1px solid rgba(255,255,255,0.1); z-index: 20; }
+  .nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; transition: 0.2s; padding: 4px 12px; border-radius: 40px; background: rgba(255,255,255,0.03); }
+  .nav-item i { font-size: 22px; }
+  .nav-item span { font-size: 10px; font-weight: 500; }
+  .nav-item.active { background: linear-gradient(125deg, #3b82f6, #6366f1); color: white; }
+  /* صفحة إدارة الأصدقاء (بدون طلبات) */
+  .friends-management-container { max-width: 600px; margin: 20px auto; padding: 0 16px; display: flex; flex-direction: column; gap: 20px; }
+  .friends-card { background: rgba(20,30,55,0.7); backdrop-filter: blur(12px); border-radius: 40px; padding: 20px; border: 1px solid rgba(255,255,255,0.1); }
+  .friends-card h3 { margin-bottom: 15px; text-align: center; }
+  .friend-item { display: flex; align-items: center; justify-content: space-between; padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+  .friend-info { display: flex; align-items: center; gap: 12px; }
+  .friend-avatar { font-size: 36px; }
+  .friend-name { font-weight: bold; }
+  .friend-actions { display: flex; gap: 8px; }
+  .friend-actions button { background: rgba(255,255,255,0.1); border: none; border-radius: 30px; padding: 5px 12px; cursor: pointer; color: white; }
+  .friend-actions button.delete { background: var(--danger); }
+  /* صفحة الدردشة */
+  .private-chat-container { max-width: 600px; margin: 20px auto; padding: 0 16px; display: flex; flex-direction: column; gap: 20px; }
+  .private-chat-header { display: flex; align-items: center; justify-content: space-between; background: rgba(20,30,55,0.7); backdrop-filter: blur(12px); border-radius: 40px; padding: 12px 20px; margin-bottom: 8px; }
+  .private-chat-header h3 { font-size: 18px; }
+  .private-chat-header .header-icons { display: flex; gap: 15px; }
+  .private-chat-header .header-icons .icon-btn-small { background: rgba(255,255,255,0.1); border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: pointer; transition: 0.2s; color: var(--text-light); position: relative; }
+  .private-chat-header .header-icons .icon-btn-small:hover { background: rgba(59,130,246,0.5); transform: scale(1.05); }
+  .badge { position: absolute; top: -5px; right: -5px; background: var(--danger); color: white; font-size: 10px; border-radius: 50%; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; }
+  .conversations-list { background: rgba(20,30,55,0.7); backdrop-filter: blur(12px); border-radius: 40px; padding: 16px; border: 1px solid rgba(255,255,255,0.1); }
+  .conversation-item { display: flex; align-items: center; gap: 12px; padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); cursor: pointer; transition: 0.2s; border-radius: 24px; }
+  .conversation-item:hover { background: rgba(59,130,246,0.2); }
+  .conversation-avatar { font-size: 42px; }
+  .conversation-info { flex: 1; }
+  .conversation-name { font-weight: bold; font-size: 16px; }
+  .conversation-last { font-size: 12px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .conversation-time { font-size: 10px; color: var(--text-muted); }
+  .chat-view { background: rgba(20,30,55,0.7); backdrop-filter: blur(12px); border-radius: 40px; padding: 16px; border: 1px solid rgba(255,255,255,0.1); display: none; flex-direction: column; }
+  .chat-header { display: flex; align-items: center; justify-content: space-between; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
+  .chat-user-info { display: flex; align-items: center; gap: 12px; }
+  .chat-header-avatar { font-size: 48px; }
+  .chat-user-details { display: flex; flex-direction: column; }
+  .chat-header-name { font-weight: bold; font-size: 18px; }
+  .chat-header-id { font-size: 11px; color: var(--text-muted); font-family: monospace; }
+  .chat-actions { display: flex; gap: 8px; }
+  .clear-chat-btn { background: rgba(239,68,68,0.2); border: none; border-radius: 40px; padding: 6px 12px; cursor: pointer; color: var(--danger); font-size: 12px; }
+  .back-to-list { background: rgba(255,255,255,0.1); border: none; border-radius: 40px; padding: 6px 12px; cursor: pointer; color: white; }
+  .messages-area { height: 55vh; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; margin-bottom: 12px; padding: 8px; background: rgba(0,0,0,0.2); border-radius: 32px; }
+  .private-message { display: flex; align-items: flex-start; gap: 10px; position: relative; }
+  .private-message.sent { flex-direction: row-reverse; }
+  .private-message.sent .message-bubble { background: var(--primary); }
+  .message-bubble { background: rgba(255,255,255,0.08); border-radius: 24px; padding: 10px 15px; max-width: 80%; word-break: break-word; position: relative; }
+  .message-text { font-size: 14px; color: #e2e8f0; }
+  .message-time { font-size: 9px; color: var(--text-muted); margin-top: 4px; text-align: left; }
+  .delete-message-btn { position: absolute; top: 5px; left: 5px; background: rgba(0,0,0,0.5); border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 10px; cursor: pointer; color: #fff; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s; }
+  .private-message:hover .delete-message-btn { opacity: 1; }
+  .private-message.sent .delete-message-btn { left: auto; right: 5px; }
+  .chat-input-area { display: flex; gap: 10px; align-items: center; margin-top: 8px; }
+  .chat-input-area input { flex: 1; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 60px; padding: 12px 18px; color: white; outline: none; }
+  .chat-input-area button { background: var(--primary); padding: 0 20px; border-radius: 60px; border: none; font-weight: bold; color: white; cursor: pointer; }
+  .friend-request-item { display: flex; align-items: center; justify-content: space-between; padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+  .friend-request-item .request-actions { display: flex; gap: 10px; }
+  .request-actions button.accept { background: var(--success); }
+  .request-actions button.reject { background: var(--danger); }
+  .back-to-chat-btn { background: var(--primary); border: none; padding: 10px; border-radius: 40px; color: white; font-weight: bold; cursor: pointer; width: 100%; margin-top: 20px; }
+  .friends-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+  .friends-header .icon-btn-small { background: rgba(255,255,255,0.1); border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: pointer; transition: 0.2s; color: var(--text-light); }
+  .friends-header .icon-btn-small:hover { background: rgba(59,130,246,0.5); transform: scale(1.05); }
+  .no-results { text-align: center; padding: 40px; color: var(--text-muted); grid-column: 1/-1; }
+  .search-results-divider, .rooms-header { grid-column: 1/-1; text-align: center; margin: 20px 0 10px; font-size: 18px; font-weight: bold; color: var(--primary); border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; }
+  @media (max-width: 550px) { .mics-grid { grid-template-columns: repeat(2, 1fr); } .room-controls .ctrl-btn { font-size: 12px; padding: 8px 12px; } .leaderboard-item { flex-wrap: wrap; } .user-info { width: 100%; } .participant-item { flex-wrap: wrap; } .tabs { gap: 6px; } .tab { font-size: 12px; padding: 4px 12px; } .top-icons .icon-btn { width: 38px; height: 38px; font-size: 18px; } .flags-filter { gap: 6px; } .flag-filter-btn { font-size: 12px; padding: 3px 8px; } }
+</style>
+</head>
+<body>
+
+<!-- شاشة تسجيل الدخول -->
+<div id="authScreen" class="auth-screen">
+  <div class="auth-card" id="authCard">
+    <h2 id="authTitle">🔐 تسجيل الدخول</h2>
+    <input type="email" id="authEmail" class="auth-input" placeholder="البريد الإلكتروني" autocomplete="email">
+    <input type="password" id="authPassword" class="auth-input" placeholder="كلمة المرور" autocomplete="current-password">
+    <div id="authError" class="error-msg"></div>
+    <button id="authSubmitBtn" class="auth-btn">دخول</button>
+    <div class="auth-switch" id="authSwitchText">ليس لديك حساب؟ <span id="toggleAuthMode">إنشاء حساب جديد</span></div>
+  </div>
+</div>
+
+<!-- شاشة إكمال الملف الشخصي -->
+<div id="profileCompletionScreen" class="auth-screen" style="display: none;">
+  <div class="auth-card profile-completion">
+    <h2>📝 أكمل ملفك الشخصي</h2>
+    <input type="text" id="completionUsername" class="auth-input" placeholder="اسم المستخدم (سيظهر للجميع)" maxlength="30">
+    <div class="avatar-grid" id="avatarGrid"></div>
+    <textarea id="completionBio" rows="3" placeholder="السيرة الذاتية (اختياري)"></textarea>
+    <input type="date" id="completionBirthDate" class="date-input" placeholder="تاريخ الميلاد">
+    <div class="country-select">
+      <span class="country-flag" id="selectedFlag">🇸🇦</span>
+      <select id="completionCountry"></select>
+    </div>
+    <div class="gender-icons">
+      <div class="gender-option" data-gender="male">♂️ ذكر</div>
+      <div class="gender-option" data-gender="female">♀️ أنثى</div>
+    </div>
+    <div id="completionError" class="error-msg"></div>
+    <button id="completeProfileBtn" class="auth-btn">✅ إكمال التسجيل</button>
+    <div class="auth-switch" onclick="showLoginScreen()">🔙 العودة لتسجيل الدخول</div>
+  </div>
+</div>
+
+<!-- باقي المودالات -->
+<div id="editProfileModal" class="modal"><div class="modal-content"><h3>✏️ تعديل الملف الشخصي</h3><input type="text" id="editUsername" class="auth-input" placeholder="اسم المستخدم"><div class="avatar-grid" id="editAvatarGrid"></div><textarea id="editBio" rows="3" placeholder="السيرة الذاتية"></textarea><input type="date" id="editBirthDate" class="date-input"><div class="country-select"><span class="country-flag" id="editSelectedFlag">🇸🇦</span><select id="editCountry"></select></div><div class="gender-icons"><div class="gender-option" data-gender="male">♂️ ذكر</div><div class="gender-option" data-gender="female">♀️ أنثى</div></div><div id="editError" class="error-msg"></div><button id="saveProfileBtn" class="auth-btn">💾 حفظ التغييرات</button><button class="close-modal" onclick="closeEditModal()">إلغاء</button></div></div>
+<div id="participantsModal" class="modal"><div class="modal-content participants-modal"><h3>👥 قائمة المشاركين</h3><div id="participantsListContainer"></div><button class="close-modal" onclick="closeParticipantsModal()">إغلاق</button></div></div>
+<div id="membersModal" class="modal"><div class="modal-content participants-modal"><h3>👥 أعضاء الغرفة</h3><div id="membersListContainer"></div><button class="close-modal" onclick="closeMembersModal()">إغلاق</button></div></div>
+<div id="createRoomModal" class="modal"><div class="modal-content"><h3>➕ إنشاء غرفة جديدة</h3><input type="text" id="newRoomName" class="auth-input" placeholder="اسم الغرفة" maxlength="40"><div class="avatar-grid" id="roomAvatarGrid"></div><div class="country-select" style="margin:12px 0;"><span class="country-flag" id="newRoomSelectedFlag">🇸🇦</span><select id="newRoomCountry"></select></div><textarea id="newRoomBio" rows="3" placeholder="السيرة الذاتية للغرفة (اختياري، بحد أقصى 80 حرفاً)" maxlength="80"></textarea><div id="createRoomError" class="error-msg"></div><button id="confirmCreateRoomBtn" class="auth-btn">✅ إنشاء الغرفة</button><button class="close-modal" onclick="closeCreateRoomModal()">إلغاء</button></div></div>
+<div id="editRoomModal" class="modal"><div class="modal-content"><h3>✏️ تعديل بيانات الغرفة</h3><input type="text" id="editRoomName" class="auth-input" placeholder="اسم الغرفة" maxlength="40"><div class="avatar-grid" id="editRoomAvatarGrid"></div><textarea id="editRoomBio" rows="3" placeholder="السيرة الذاتية للغرفة (بحد أقصى 80 حرفاً)" maxlength="80"></textarea><div id="editRoomError" class="error-msg"></div><button id="saveRoomChangesBtn" class="auth-btn">💾 حفظ التغييرات</button><button class="close-modal" onclick="closeEditRoomModal()">إلغاء</button></div></div>
+<div id="giftModal" class="modal"><div class="modal-content gift-modal-box"><h3>🎁 إرسال هدية</h3><div class="balance-display" id="giftBalanceDisplay">💰 رصيدك: <span id="giftBalanceAmount">0</span> كوين</div><div class="gift-items" id="giftItemsContainer"></div><div class="recipient-select"><select id="giftRecipientSelect"><option value="">اختر المستلم</option></select></div><button id="sendGiftConfirmBtn" class="auth-btn">إرسال الهدية</button><button class="close-modal" onclick="closeGiftModal()">إلغاء</button></div></div>
+<div id="searchOverlay" class="search-overlay"><input type="text" id="searchOverlayInput" placeholder="🔍 ابحث عن غرفة أو مستخدم... (اسم أو معرف)"><button class="close-search" onclick="closeSearchOverlay()">إلغاء</button></div>
+<div id="rechargeModal" class="modal"><div class="modal-content"><h3>💎 شحن الكوينز</h3><div style="margin:10px 0; padding:10px; background:rgba(255,215,0,0.1); border-radius:28px;"><span>💰 رصيدك الحالي: </span><span id="rechargeBalanceDisplay">0</span> كوين</div><div id="packagesContainer" class="packages-grid"></div><button class="close-modal" onclick="closeRechargeModal()">إغلاق</button></div></div>
+<div id="friendRequestsModal" class="modal"><div class="modal-content"><h3><i class="fas fa-bell"></i> طلبات الصداقة</h3><div id="friendRequestsModalContainer" style="max-height: 60vh; overflow-y: auto; margin: 15px 0;"></div><button class="close-modal" onclick="closeFriendRequestsModal()">إغلاق</button></div></div>
+<div id="searchFriendsModal" class="modal"><div class="modal-content"><h3><i class="fas fa-search"></i> بحث عن أصدقاء جدد</h3><input type="text" id="searchFriendsInput" class="auth-input" placeholder="ابحث باسم المستخدم أو المعرف"><div id="searchFriendsResults" style="max-height: 300px; overflow-y: auto; margin: 15px 0;"></div><button class="close-modal" onclick="closeSearchFriendsModal()">إغلاق</button></div></div>
+
+<!-- المحتوى الرئيسي -->
+<div id="mainApp" style="display: none;">
+  <div class="top-bar" id="topBar"><div class="top-icons"><div class="icon-btn" onclick="openSearchOverlay()">🔍</div><div class="icon-btn" onclick="showLeaderboard()">🏆</div><div class="icon-btn" onclick="openCreateRoomModal()">➕</div></div><div class="tabs" id="tabsContainer"><div class="tab active" data-filter="all" onclick="filterRooms('all',this)">✨ الكل</div><div class="tab" data-filter="my" onclick="filterRooms('my',this)">📁 غرفي</div><div class="tab" data-filter="popular" onclick="filterRooms('popular',this)">🔥 الشائعة</div><div class="tab" data-filter="new" onclick="filterRooms('new',this)">🆕 الجديدة</div></div></div>
+  <div class="banner" id="banner"><div class="slider" id="slider"><div class="slide s1">🎙️ مرحباً بك في يلا لايف</div><div class="slide s2">🔥 تفاعل وشارك بالصوت</div><div class="slide s3">🚀 غرف حية يومياً</div></div></div>
+  <div class="rooms" id="roomsContainer"></div>
+  
+  <div class="room" id="roomView"><div class="room-header"><div class="room-title-row"><div class="room-name"><span class="room-avatar" id="roomAvatarDisplay">🎙️</span><span id="roomTitle"></span><span id="roomEditIcon" style="cursor:pointer; font-size:20px; display:none;" onclick="openEditRoomModal()">⚙️</span></div><div class="room-id" id="roomIdDisplay"></div></div><div class="room-bio" id="roomBioDisplay"></div><div class="participants-count" id="participantsCount" onclick="showParticipantsList()">👥 <span id="participantsCountNum">0</span> مشارك<span class="members-icon" onclick="event.stopPropagation(); showMembersList()"><i class="fas fa-users"></i></span></div></div><div class="mics-grid" id="micsList"></div><div class="room-controls" id="roomControls"><button class="ctrl-btn" id="micToggleBtn"><i class="fas fa-microphone-alt"></i> الميكروفون</button><button class="ctrl-btn warning" id="raiseHandBtn"><i class="fas fa-hand-paper"></i> رفع اليد</button><button class="ctrl-btn" id="joinRoomBtn" style="display:none;"><i class="fas fa-sign-in-alt"></i> انضمام للغرفة</button><button class="ctrl-btn danger" id="leaveRoomBtn"><i class="fas fa-sign-out-alt"></i> خروج</button></div><div class="chat-area"><div class="chat-messages" id="chatMessages"></div><div class="chat-input"><input type="text" id="messageInput" placeholder="اكتب رسالة..."><div class="gift-icon-btn" onclick="openGiftModal()"><i class="fas fa-gift"></i></div><button onclick="sendMsg()">إرسال</button></div></div></div>
+  
+  <div id="profileView" style="display:none;"><div class="profile-container"><div class="profile-card personal-card"><div class="settings-icon" onclick="openEditModal()"><i class="fas fa-cog"></i></div><div class="logout-icon" onclick="logout()"><i class="fas fa-sign-out-alt"></i></div><div class="profile-avatar-center"><div class="avatar-large" id="profileAvatarDisplay">🌟</div></div><div class="profile-name-section"><div class="profile-username" id="profileUsernameDisplay"></div><div class="profile-userid" id="profileUserIdDisplay"></div></div><div class="profile-bio" id="profileBioDisplay"><i class="fas fa-info-circle"></i> <span id="bioTextDisplay">لا يوجد سيرة ذاتية</span></div><div class="personal-info"><div class="info-item"><i class="fas fa-calendar-alt"></i> <span id="profileAgeDisplay"></span></div><div class="info-item"><i class="fas fa-map-marker-alt"></i> <span id="profileCountryDisplay"></span></div><div class="info-item"><i class="fas fa-venus-mars"></i> <span id="profileGenderDisplay"></span></div><div class="info-item info-email"><i class="fas fa-envelope"></i> <span id="profileEmailDisplay"></span></div></div></div><div class="profile-card stats-card"><div class="stats-grid"><div class="stat-card"><i class="fas fa-coins"></i><div class="stat-value" id="profileCoinsStat">0</div><div class="stat-label">رصيد الكوينز</div></div><div class="stat-card"><i class="fas fa-paper-plane"></i><div class="stat-value" id="profileSentStat">0</div><div class="stat-label">إجمالي أرسل</div></div><div class="stat-card"><i class="fas fa-gift"></i><div class="stat-value" id="profileReceivedStat">0</div><div class="stat-label">إجمالي استلم</div></div><div class="stat-card"><i class="fas fa-charging-station"></i><div class="stat-value" id="profilePurchasedStat">0</div><div class="stat-label">إجمالي شحن</div></div></div><div class="action-buttons-profile"><button class="btn-profile btn-recharge" onclick="openRechargeModal()"><i class="fas fa-bolt"></i> شحن الكوينز</button><button class="btn-profile btn-home" onclick="goHome()"><i class="fas fa-home"></i> الرئيسية</button></div></div></div></div>
+  
+  <div id="leaderboardView" style="display:none;"><div class="leaderboard-header"><h2>🏆 لوحة المتصدرين (الكوينز) 🏆</h2><p style="color:#94a3b8;">ترتيب بناءً على العملات الذهبية</p></div><div class="leaderboard-tabs" id="leaderboardTabs"><div class="lb-tab active" data-lbtab="rank">🏅 ترتيب المستخدمين</div><div class="lb-tab" data-lbtab="send">🎁 إرسال الكوينز</div><div class="lb-tab" data-lbtab="receive">📦 استلام الكوينز</div><div class="lb-tab" data-lbtab="rooms">🔥 الغرف (كوينز مرسلة)</div><div class="lb-tab" data-lbtab="charge">💎 الشحن (إجمالي مشحون)</div></div><div id="leaderboardContent" class="leaderboard-list"></div><button class="close-leaderboard" onclick="goHome()">🔙 العودة للرئيسية</button></div>
+  
+  <!-- صفحة الدردشة الخاصة -->
+  <div id="privateChatView" style="display:none;">
+    <div class="private-chat-container">
+      <div class="private-chat-header">
+        <h3><i class="fas fa-comment-dots"></i> دردشة خاصة</h3>
+        <div class="header-icons">
+          <div class="icon-btn-small" onclick="showFriendsManagement()" title="الأصدقاء"><i class="fas fa-users"></i></div>
+          <div class="icon-btn-small" id="friendRequestsIcon" onclick="showFriendRequestsModal()" title="طلبات الصداقة">
+            <i class="fas fa-bell"></i>
+            <span id="requestsBadge" class="badge" style="display: none;">0</span>
+          </div>
+        </div>
+      </div>
+      <div class="conversations-list" id="conversationsList">
+        <div id="conversationsContainer"></div>
+      </div>
+      <div class="chat-view" id="chatView">
+        <div class="chat-header">
+          <div class="chat-user-info">
+            <div class="chat-header-avatar" id="chatHeaderAvatar">👤</div>
+            <div class="chat-user-details">
+              <div class="chat-header-name" id="chatHeaderName"></div>
+              <div class="chat-header-id" id="chatHeaderId"></div>
+            </div>
+          </div>
+          <div class="chat-actions">
+            <button class="clear-chat-btn" onclick="clearConversation()"><i class="fas fa-trash-alt"></i> مسح المحادثة</button>
+            <button class="back-to-list" onclick="closeChatView()">↩️ الرجوع</button>
+          </div>
+        </div>
+        <div class="messages-area" id="privateMessagesArea"></div>
+        <div class="chat-input-area">
+          <input type="text" id="privateMessageInput" placeholder="اكتب رسالتك...">
+          <button onclick="sendPrivateMessage()">إرسال</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- صفحة إدارة الأصدقاء -->
+  <div id="friendsManagementView" style="display:none;">
+    <div class="friends-management-container">
+      <div class="friends-card">
+        <div class="friends-header">
+          <h3 style="margin:0;">⭐ أصدقائي</h3>
+          <div class="icon-btn-small" onclick="openSearchFriendsModal()" title="إضافة صديق جديد"><i class="fas fa-user-plus"></i></div>
+        </div>
+        <div id="friendsListContainer"></div>
+      </div>
+      <button class="back-to-chat-btn" onclick="goBackToChat()">🔙 العودة إلى الدردشة</button>
+    </div>
+  </div>
+  
+  <div class="bottom-nav" id="bottomNav">
+    <div class="nav-item" id="navHome" onclick="goHome()"><i class="fas fa-home"></i><span>الرئيسية</span></div>
+    <div class="nav-item" id="navChat" onclick="goPrivateChat()"><i class="fas fa-comment-dots"></i><span>الدردشة</span></div>
+    <div class="nav-item" id="navProfile" onclick="goProfile()"><i class="fas fa-user"></i><span>ملفي</span></div>
+  </div>
+</div>
+
+<script>
+  // ==================== قاعدة البيانات والوظائف الأساسية ====================
+  let currentUser = null;
+  const countries = [
+    { name: "السعودية", code: "+966", flag: "🇸🇦" },{ name: "مصر", code: "+20", flag: "🇪🇬" },{ name: "الإمارات", code: "+971", flag: "🇦🇪" },{ name: "الكويت", code: "+965", flag: "🇰🇼" },{ name: "قطر", code: "+974", flag: "🇶🇦" },{ name: "البحرين", code: "+973", flag: "🇧🇭" },{ name: "عمان", code: "+968", flag: "🇴🇲" },{ name: "الأردن", code: "+962", flag: "🇯🇴" },{ name: "لبنان", code: "+961", flag: "🇱🇧" },{ name: "فلسطين", code: "+970", flag: "🇵🇸" },{ name: "العراق", code: "+964", flag: "🇮🇶" },{ name: "سوريا", code: "+963", flag: "🇸🇾" },{ name: "المغرب", code: "+212", flag: "🇲🇦" },{ name: "الجزائر", code: "+213", flag: "🇩🇿" },{ name: "تونس", code: "+216", flag: "🇹🇳" },{ name: "ليبيا", code: "+218", flag: "🇱🇾" },{ name: "السودان", code: "+249", flag: "🇸🇩" },{ name: "اليمن", code: "+967", flag: "🇾🇪" }
+  ];
+  const avatars = ["😀", "😎", "🦸", "🦹", "🐱", "🐶", "🦊", "🐼", "🐨", "🐸", "🐙", "🦄", "🍕", "🎸", "⚽", "📚", "🎨", "💻", "🚀", "⭐", "🌟", "💎", "👑", "🎭"];
+  const gifts = [
+    { icon: "🌸", name: "زهرة", price: 10 },{ icon: "🍕", name: "بيتزا", price: 25 },{ icon: "🎁", name: "هدية سحرية", price: 50 },{ icon: "💎", name: "ماسة", price: 100 },{ icon: "🚀", name: "صاروخ", price: 200 },{ icon: "👑", name: "تاج", price: 500 }
+  ];
+  const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+
+  // ========== نظام الأصدقاء ==========
+  let friendsData = JSON.parse(localStorage.getItem("friends_data") || '{"friends":{},"requests":{}}');
+  function saveFriendsData() { localStorage.setItem("friends_data", JSON.stringify(friendsData)); }
+  function getFriendsList(userId) { return friendsData.friends[userId] || []; }
+  function getFriendRequests(userId) { return friendsData.requests[userId] || []; }
+  function sendFriendRequest(fromId, toId) {
+    if (fromId === toId) return false;
+    if (getFriendsList(fromId).includes(toId)) return false;
+    let requests = getFriendRequests(toId);
+    if (requests.some(r => r.from === fromId)) return false;
+    requests.push({ from: fromId, timestamp: Date.now() });
+    friendsData.requests[toId] = requests;
+    saveFriendsData();
+    updateRequestsBadge();
+    return true;
+  }
+  function acceptFriendRequest(userId, requesterId) {
+    let requests = getFriendRequests(userId);
+    requests = requests.filter(r => r.from !== requesterId);
+    friendsData.requests[userId] = requests;
+    if (!friendsData.friends[userId]) friendsData.friends[userId] = [];
+    if (!friendsData.friends[requesterId]) friendsData.friends[requesterId] = [];
+    if (!friendsData.friends[userId].includes(requesterId)) friendsData.friends[userId].push(requesterId);
+    if (!friendsData.friends[requesterId].includes(userId)) friendsData.friends[requesterId].push(userId);
+    saveFriendsData();
+    updateRequestsBadge();
+    if (document.getElementById("friendsManagementView").style.display === "block") renderFriendsList();
+    if (document.getElementById("privateChatView").style.display === "block") renderConversationsList();
+    if (document.getElementById("friendRequestsModal").style.display === "flex") renderFriendRequestsModal();
+  }
+  function rejectFriendRequest(userId, requesterId) {
+    let requests = getFriendRequests(userId);
+    requests = requests.filter(r => r.from !== requesterId);
+    friendsData.requests[userId] = requests;
+    saveFriendsData();
+    updateRequestsBadge();
+    if (document.getElementById("friendRequestsModal").style.display === "flex") renderFriendRequestsModal();
+  }
+  function deleteFriend(userId, friendId) {
+    if (friendsData.friends[userId]) friendsData.friends[userId] = friendsData.friends[userId].filter(f => f !== friendId);
+    if (friendsData.friends[friendId]) friendsData.friends[friendId] = friendsData.friends[friendId].filter(f => f !== userId);
+    saveFriendsData();
+    if (document.getElementById("friendsManagementView").style.display === "block") renderFriendsList();
+    if (document.getElementById("privateChatView").style.display === "block") renderConversationsList();
+    if (currentChatPartner === friendId) closeChatView();
+  }
+  function isFriend(userId, otherId) {
+    return getFriendsList(userId).includes(otherId);
+  }
+  function updateRequestsBadge() {
+    const badge = document.getElementById("requestsBadge");
+    const count = getFriendRequests(currentUser.id).length;
+    if (count > 0) {
+      badge.innerText = count;
+      badge.style.display = "flex";
+    } else {
+      badge.style.display = "none";
+    }
+  }
+
+  // ========== الرسائل الخاصة مع إمكانية الحذف ومسح المحادثة ==========
+  let privateMessages = JSON.parse(localStorage.getItem("private_messages") || "{}");
+  function savePrivateMessages() { localStorage.setItem("private_messages", JSON.stringify(privateMessages)); }
+  function getConversationKey(userId1, userId2) { return [userId1, userId2].sort().join("_"); }
+  function getMessagesBetween(userId1, userId2) { const key = getConversationKey(userId1, userId2); return privateMessages[key] || []; }
+  function addPrivateMessage(fromId, toId, text) {
+    if (!isFriend(fromId, toId)) return false;
+    const key = getConversationKey(fromId, toId);
+    if (!privateMessages[key]) privateMessages[key] = [];
+    privateMessages[key].push({ from: fromId, to: toId, text: text, timestamp: Date.now(), deleted: false });
+    savePrivateMessages();
+    return true;
+  }
+  function deleteSingleMessage(conversationKey, msgIndex) {
+    const msgs = privateMessages[conversationKey];
+    if (msgs && msgs[msgIndex]) {
+      msgs[msgIndex].deleted = true;
+      savePrivateMessages();
+    }
+  }
+  function clearConversationMessages(conversationKey) {
+    privateMessages[conversationKey] = [
+      { from: "system", to: "both", text: "تم مسح المحادثة", timestamp: Date.now(), deleted: false }
+    ];
+    savePrivateMessages();
+  }
+
+  function getConversationsForUser(userId) {
+    const convMap = new Map();
+    const friends = getFriendsList(userId);
+    // أولاً نضيف جميع الأصدقاء (حتى لو لا توجد محادثات)
+    friends.forEach(fid => {
+      const key = getConversationKey(userId, fid);
+      const messages = privateMessages[key];
+      let lastMsg = "";
+      let lastTime = 0;
+      if (messages && messages.length) {
+        const last = messages[messages.length-1];
+        lastMsg = last.deleted ? "تم حذف هذه الرسالة" : last.text;
+        lastTime = last.timestamp;
+      }
+      convMap.set(fid, { lastMsg, lastTime });
+    });
+    // ثم نجلب أي محادثات قديمة لغير الأصدقاء (لن تظهر لأننا نعرض الأصدقاء فقط)
+    return Array.from(convMap.entries()).map(([partnerId, data]) => ({ partnerId, lastMsg: data.lastMsg, lastTime: data.lastTime }));
+  }
+
+  let currentChatPartner = null;
+  function renderConversationsList() {
+    const container = document.getElementById("conversationsContainer");
+    if (!container) return;
+    const convs = getConversationsForUser(currentUser.id);
+    convs.sort((a,b) => b.lastTime - a.lastTime);
+    container.innerHTML = "";
+    if (convs.length === 0) {
+      container.innerHTML = '<div class="no-results">💬 لا يوجد أصدقاء بعد، أضف أصدقاء للدردشة</div>';
+      return;
+    }
+    const usersMap = new Map(getAllUsers().map(u => [u.id, u]));
+    convs.forEach(conv => {
+      const partner = usersMap.get(conv.partnerId);
+      if (!partner) return;
+      const div = document.createElement("div");
+      div.className = "conversation-item";
+      div.onclick = () => openChatWith(conv.partnerId);
+      div.innerHTML = `
+        <div class="conversation-avatar">${partner.avatar}</div>
+        <div class="conversation-info">
+          <div class="conversation-name">${partner.username}</div>
+          <div class="conversation-last">${conv.lastMsg.substring(0, 30)}${conv.lastMsg.length>30?"...":""}</div>
+        </div>
+        <div class="conversation-time">${conv.lastTime ? new Date(conv.lastTime).toLocaleTimeString() : ""}</div>
+      `;
+      container.appendChild(div);
+    });
+  }
+
+  function openChatWith(partnerId) {
+    if (!isFriend(currentUser.id, partnerId)) { alert("لا يمكنك الدردشة مع هذا المستخدم لأنه ليس صديقاً"); return; }
+    currentChatPartner = partnerId;
+    const users = getAllUsers();
+    const partner = users.find(u => u.id === partnerId);
+    if (!partner) return;
+    document.getElementById("chatHeaderAvatar").innerText = partner.avatar;
+    document.getElementById("chatHeaderName").innerText = partner.username;
+    document.getElementById("chatHeaderId").innerHTML = `🆔 ${partner.userId}`;
+    renderPrivateMessages();
+    document.getElementById("conversationsList").style.display = "none";
+    document.getElementById("chatView").style.display = "flex";
+    document.getElementById("privateMessageInput").focus();
+  }
+
+  function renderPrivateMessages() {
+    const area = document.getElementById("privateMessagesArea");
+    if (!area || !currentChatPartner) return;
+    const key = getConversationKey(currentUser.id, currentChatPartner);
+    const msgs = privateMessages[key] || [];
+    area.innerHTML = "";
+    msgs.forEach((msg, idx) => {
+      const isOwn = msg.from === currentUser.id;
+      const isSystem = msg.from === "system";
+      const div = document.createElement("div");
+      div.className = `private-message ${isOwn ? "sent" : "received"}`;
+      let content = '';
+      if (msg.deleted) {
+        content = `<div class="message-bubble"><div class="message-text" style="color:#94a3b8;">🗑️ تم حذف هذه الرسالة</div><div class="message-time">${new Date(msg.timestamp).toLocaleTimeString()}</div></div>`;
+      } else {
+        content = `<div class="message-bubble"><div class="message-text">${msg.text}</div><div class="message-time">${new Date(msg.timestamp).toLocaleTimeString()}</div>`;
+        if (!isSystem && (isOwn || msg.from === currentUser.id)) {
+          content += `<button class="delete-message-btn" onclick="deleteMessage('${key}', ${idx})"><i class="fas fa-trash"></i></button>`;
+        }
+        content += `</div>`;
+      }
+      div.innerHTML = content;
+      area.appendChild(div);
+    });
+    area.scrollTop = area.scrollHeight;
+  }
+
+  function sendPrivateMessage() {
+    if (!currentUser || !currentChatPartner) return;
+    if (!isFriend(currentUser.id, currentChatPartner)) { alert("لا يمكنك إرسال رسالة لهذا المستخدم لأنه ليس صديقاً"); closeChatView(); renderConversationsList(); return; }
+    const input = document.getElementById("privateMessageInput");
+    const text = input.value.trim();
+    if (!text) return;
+    if (addPrivateMessage(currentUser.id, currentChatPartner, text)) {
+      input.value = "";
+      renderPrivateMessages();
+      renderConversationsList();
+    } else {
+      alert("حدث خطأ في إرسال الرسالة");
+    }
+  }
+
+  function deleteMessage(convKey, msgIndex) {
+    if (confirm("هل تريد حذف هذه الرسالة؟")) {
+      deleteSingleMessage(convKey, msgIndex);
+      renderPrivateMessages();
+      renderConversationsList(); // تحديث آخر رسالة في القائمة
+    }
+  }
+
+  function clearConversation() {
+    if (!currentChatPartner) return;
+    if (confirm("هل تريد مسح المحادثة بالكامل؟ سيظهر إشعار للطرفين.")) {
+      const key = getConversationKey(currentUser.id, currentChatPartner);
+      clearConversationMessages(key);
+      renderPrivateMessages();
+      renderConversationsList();
+    }
+  }
+
+  function closeChatView() {
+    document.getElementById("conversationsList").style.display = "block";
+    document.getElementById("chatView").style.display = "none";
+    currentChatPartner = null;
+  }
+
+  // ========== صفحة إدارة الأصدقاء ==========
+  function showFriendsManagement() {
+    document.getElementById("privateChatView").style.display = "none";
+    document.getElementById("friendsManagementView").style.display = "block";
+    renderFriendsList();
+  }
+
+  function goBackToChat() {
+    document.getElementById("friendsManagementView").style.display = "none";
+    document.getElementById("privateChatView").style.display = "block";
+    renderConversationsList();
+    closeChatView();
+  }
+
+  function renderFriendsList() {
+    const container = document.getElementById("friendsListContainer");
+    const friendsIds = getFriendsList(currentUser.id);
+    const usersMap = new Map(getAllUsers().map(u => [u.id, u]));
+    container.innerHTML = "";
+    if (friendsIds.length === 0) { container.innerHTML = '<div class="no-results">👥 لا يوجد أصدقاء بعد</div>'; return; }
+    friendsIds.forEach(fid => {
+      const friend = usersMap.get(fid);
+      if (!friend) return;
+      const div = document.createElement("div");
+      div.className = "friend-item";
+      div.innerHTML = `
+        <div class="friend-info">
+          <div class="friend-avatar">${friend.avatar}</div>
+          <div class="friend-name">${friend.username}</div>
+        </div>
+        <div class="friend-actions">
+          <button class="delete" onclick="deleteFriendUI('${fid}')">🗑️ حذف</button>
+        </div>
+      `;
+      container.appendChild(div);
+    });
+  }
+
+  function deleteFriendUI(friendId) {
+    if (confirm("هل أنت متأكد من حذف هذا الصديق؟")) {
+      deleteFriend(currentUser.id, friendId);
+      renderFriendsList();
+      renderConversationsList();
+      if (currentChatPartner === friendId) closeChatView();
+    }
+  }
+
+  // ========== مودال البحث عن أصدقاء جدد ==========
+  function openSearchFriendsModal() {
+    const modal = document.getElementById("searchFriendsModal");
+    document.getElementById("searchFriendsInput").value = "";
+    document.getElementById("searchFriendsResults").innerHTML = "";
+    modal.style.display = "flex";
+    document.getElementById("searchFriendsInput").focus();
+  }
+  function closeSearchFriendsModal() { document.getElementById("searchFriendsModal").style.display = "none"; }
+  document.getElementById("searchFriendsInput")?.addEventListener("input", (e) => {
+    const term = e.target.value.trim().toLowerCase();
+    const resultsDiv = document.getElementById("searchFriendsResults");
+    if (!term) { resultsDiv.innerHTML = ""; return; }
+    const users = getAllUsers().filter(u => u.id !== currentUser.id && (u.username.toLowerCase().includes(term) || u.userId.includes(term)));
+    resultsDiv.innerHTML = "";
+    if (users.length === 0) { resultsDiv.innerHTML = '<div class="no-results">😞 لا يوجد مستخدمون</div>'; return; }
+    users.forEach(user => {
+      const alreadyFriend = isFriend(currentUser.id, user.id);
+      const requestSent = getFriendRequests(user.id).some(r => r.from === currentUser.id);
+      const div = document.createElement("div");
+      div.className = "search-result-item";
+      if (alreadyFriend) {
+        div.innerHTML = `<div class="friend-info"><div class="friend-avatar">${user.avatar}</div><div class="friend-name">${user.username} (${user.userId})</div></div><div><span style="color: #10b981;">✔️ هذا المستخدم صديقك بالفعل</span></div>`;
+      } else if (requestSent) {
+        div.innerHTML = `<div class="friend-info"><div class="friend-avatar">${user.avatar}</div><div class="friend-name">${user.username} (${user.userId})</div></div><div><span style="color: #f59e0b;">⏳ طلب مرسل</span></div>`;
+      } else {
+        div.innerHTML = `<div class="friend-info"><div class="friend-avatar">${user.avatar}</div><div class="friend-name">${user.username} (${user.userId})</div></div><div><button onclick="sendFriendRequestFromModal('${user.id}')">➕ إضافة صديق</button></div>`;
+      }
+      resultsDiv.appendChild(div);
+    });
+  });
+  function sendFriendRequestFromModal(toId) {
+    if (sendFriendRequest(currentUser.id, toId)) {
+      alert("✅ تم إرسال طلب الصداقة بنجاح");
+      const event = new Event('input');
+      document.getElementById("searchFriendsInput").dispatchEvent(event);
+    } else {
+      alert("لا يمكن إرسال طلب الصداقة");
+    }
+  }
+
+  // ========== مودال طلبات الصداقة ==========
+  function showFriendRequestsModal() {
+    const modal = document.getElementById("friendRequestsModal");
+    renderFriendRequestsModal();
+    modal.style.display = "flex";
+  }
+  function closeFriendRequestsModal() { document.getElementById("friendRequestsModal").style.display = "none"; }
+  function renderFriendRequestsModal() {
+    const container = document.getElementById("friendRequestsModalContainer");
+    const requests = getFriendRequests(currentUser.id);
+    const usersMap = new Map(getAllUsers().map(u => [u.id, u]));
+    container.innerHTML = "";
+    if (requests.length === 0) { container.innerHTML = '<div class="no-results">📭 لا توجد طلبات صداقة</div>'; return; }
+    requests.forEach(req => {
+      const requester = usersMap.get(req.from);
+      if (!requester) return;
+      const div = document.createElement("div");
+      div.className = "friend-request-item";
+      div.innerHTML = `
+        <div class="friend-info">
+          <div class="friend-avatar">${requester.avatar}</div>
+          <div class="friend-name">${requester.username}</div>
+        </div>
+        <div class="request-actions">
+          <button class="accept" onclick="acceptFriendRequestFromModal('${req.from}')">✅ قبول</button>
+          <button class="reject" onclick="rejectFriendRequestFromModal('${req.from}')">❌ رفض</button>
+        </div>
+      `;
+      container.appendChild(div);
+    });
+  }
+  function acceptFriendRequestFromModal(requesterId) {
+    acceptFriendRequest(currentUser.id, requesterId);
+    renderFriendRequestsModal();
+    if (document.getElementById("friendsManagementView").style.display === "block") renderFriendsList();
+    if (document.getElementById("privateChatView").style.display === "block") renderConversationsList();
+  }
+  function rejectFriendRequestFromModal(requesterId) {
+    rejectFriendRequest(currentUser.id, requesterId);
+    renderFriendRequestsModal();
+  }
+
+  // ========== باقي دوال التطبيق الأصلية (محفوظة بالكامل) ==========
+  function generateUnique7DigitId() { let users=getAllUsers(); let existingIds=new Set(users.map(u=>u.userId)); let newId; do{ newId=Math.floor(1000000+Math.random()*9000000).toString(); }while(existingIds.has(newId)); return newId; }
+  function generateRoomId() { return Math.floor(10000000+Math.random()*90000000).toString(); }
+  function initDatabase() {
+    if (!localStorage.getItem("yalla_users")) {
+      const defaultUsers = [
+        { id: "user1", userId: "8450123", email: "aser@example.com", password: "123", username: "آسر", avatar: "👑", bio: "مستخدم نشط", birthDate: "1995-05-15", countryCode: "+966", countryFlag: "🇸🇦", countryName: "السعودية", gender: "male", coinsBalance: 8450, totalCoinsSent: 3200, totalCoinsReceived: 1800, totalCoinsPurchased: 5000 },
+        { id: "user2", userId: "7200456", email: "lina@example.com", password: "123", username: "لينا", avatar: "⭐", bio: "عاشقة الموسيقى", birthDate: "1998-08-22", countryCode: "+20", countryFlag: "🇪🇬", countryName: "مصر", gender: "female", coinsBalance: 7200, totalCoinsSent: 2100, totalCoinsReceived: 2900, totalCoinsPurchased: 4000 },
+        { id: "user3", userId: "6100789", email: "kareem@example.com", password: "123", username: "كريم", avatar: "⚔️", bio: "لاعب محترف", birthDate: "1992-11-10", countryCode: "+971", countryFlag: "🇦🇪", countryName: "الإمارات", gender: "male", coinsBalance: 6100, totalCoinsSent: 1500, totalCoinsReceived: 2700, totalCoinsPurchased: 3000 },
+        { id: "user4", userId: "4900321", email: "sara@example.com", password: "123", username: "سارة", avatar: "🎤", bio: "مغنية", birthDate: "2000-03-05", countryCode: "+966", countryFlag: "🇸🇦", countryName: "السعودية", gender: "female", coinsBalance: 4900, totalCoinsSent: 2800, totalCoinsReceived: 1300, totalCoinsPurchased: 2500 },
+        { id: "user5", userId: "3750654", email: "malak@example.com", password: "123", username: "ملك", avatar: "👑", bio: "ملكة التفاعل", birthDate: "1997-07-19", countryCode: "+965", countryFlag: "🇰🇼", countryName: "الكويت", gender: "female", coinsBalance: 3750, totalCoinsSent: 950, totalCoinsReceived: 2200, totalCoinsPurchased: 1800 }
+      ];
+      localStorage.setItem("yalla_users", JSON.stringify(defaultUsers));
+    }
+    if (!localStorage.getItem("rooms_coins")) localStorage.setItem("rooms_coins", JSON.stringify({ "🔥 دردشة حرة":1240,"🎮 بلاي ستيشن":890,"🎵 موسيقى هادئة":560,"⚽ مباراة الليلة":2100,"☕ قهوة وسوالف":430,"💻 برمجة وتقنية":320,"🎭 تمثيل وصوت":780,"📚 كتب وثقافة":150 }));
+    if (!localStorage.getItem("user_rooms")) localStorage.setItem("user_rooms", JSON.stringify({}));
+    if (!localStorage.getItem("rooms_metadata")) localStorage.setItem("rooms_metadata", JSON.stringify({}));
+    if (!localStorage.getItem("user_joined_rooms")) localStorage.setItem("user_joined_rooms", JSON.stringify({}));
+    if (!localStorage.getItem("private_messages")) localStorage.setItem("private_messages", JSON.stringify({}));
+    if (!localStorage.getItem("friends_data")) localStorage.setItem("friends_data", JSON.stringify({ friends: {}, requests: {} }));
+    privateMessages = JSON.parse(localStorage.getItem("private_messages"));
+    friendsData = JSON.parse(localStorage.getItem("friends_data"));
+  }
+  function getAllUsers() { return JSON.parse(localStorage.getItem("yalla_users")); }
+  function saveUsers(users) { localStorage.setItem("yalla_users", JSON.stringify(users)); }
+  function getRoomsCoins() { return JSON.parse(localStorage.getItem("rooms_coins")); }
+  function saveRoomsCoins(roomsCoins) { localStorage.setItem("rooms_coins", JSON.stringify(roomsCoins)); }
+  function getUserRooms() { return JSON.parse(localStorage.getItem("user_rooms")); }
+  function saveUserRooms(rooms) { localStorage.setItem("user_rooms", JSON.stringify(rooms)); }
+  function getUserJoinedRooms() { return JSON.parse(localStorage.getItem("user_joined_rooms")); }
+  function saveUserJoinedRooms(joined) { localStorage.setItem("user_joined_rooms", JSON.stringify(joined)); }
+  function refreshCurrentUser() { const users=getAllUsers(); const updated=users.find(u=>u.id===currentUser.id); if(updated) currentUser=updated; }
+  function calculateAge(birthDate){ if(!birthDate) return null; const today=new Date(); const birth=new Date(birthDate); let age=today.getFullYear()-birth.getFullYear(); const m=today.getMonth()-birth.getMonth(); if(m<0||(m===0&&today.getDate()<birth.getDate())) age--; return age; }
+  function updateProfileDisplay() { document.getElementById("profileAvatarDisplay").innerText=currentUser.avatar; document.getElementById("profileUsernameDisplay").innerText=currentUser.username; document.getElementById("profileUserIdDisplay").innerHTML=`🆔 ${currentUser.userId}`; document.getElementById("bioTextDisplay").innerText=currentUser.bio||"لا يوجد سيرة ذاتية"; const age=calculateAge(currentUser.birthDate); document.getElementById("profileAgeDisplay").innerHTML=age?`${age} سنة`:"غير محدد"; document.getElementById("profileCountryDisplay").innerHTML=`${currentUser.countryFlag||"🏳️"} ${currentUser.countryName||""}`; document.getElementById("profileGenderDisplay").innerHTML=currentUser.gender==="male"?"♂️ ذكر":"♀️ أنثى"; document.getElementById("profileEmailDisplay").innerHTML=currentUser.email; document.getElementById("profileCoinsStat").innerText=currentUser.coinsBalance.toLocaleString(); document.getElementById("profileSentStat").innerText=currentUser.totalCoinsSent.toLocaleString(); document.getElementById("profileReceivedStat").innerText=currentUser.totalCoinsReceived.toLocaleString(); document.getElementById("profilePurchasedStat").innerText=currentUser.totalCoinsPurchased.toLocaleString(); }
+  function sendCoinsToUser(receiverId, amount, roomName, giftIcon) { if(!currentUser) return false; if(currentUser.coinsBalance<amount){ alert(`❌ رصيدك لا يكفي! لديك ${currentUser.coinsBalance} كوين فقط.`); return false; } let users=getAllUsers(); const senderIndex=users.findIndex(u=>u.id===currentUser.id); const receiverIndex=users.findIndex(u=>u.id===receiverId); if(senderIndex===-1||receiverIndex===-1) return false; users[senderIndex].coinsBalance-=amount; users[senderIndex].totalCoinsSent+=amount; users[receiverIndex].coinsBalance+=amount; users[receiverIndex].totalCoinsReceived+=amount; saveUsers(users); refreshCurrentUser(); let roomsCoins=getRoomsCoins(); roomsCoins[roomName]=(roomsCoins[roomName]||0)+amount; saveRoomsCoins(roomsCoins); showGiftAnimation(giftIcon,users[receiverIndex].username); addChatMessage("gift",`🎁 أرسل ${currentUser.username} هدية ${giftIcon} بقيمة ${amount} كوين إلى ${users[receiverIndex].username}`,""); const receiverInRoom=currentUsersInRoom.find(u=>u.id===receiverId); if(receiverInRoom) receiverInRoom.coins=users[receiverIndex].coinsBalance; const senderInRoom=currentUsersInRoom.find(u=>u.id===currentUser.id); if(senderInRoom) senderInRoom.coins=users[senderIndex].coinsBalance; if(document.getElementById("profileView").style.display==="block") updateProfileDisplay(); if(document.getElementById("leaderboardView").style.display==="block"){ const activeTab=document.querySelector(".lb-tab.active"); if(activeTab) renderLeaderboardTab(activeTab.getAttribute("data-lbtab")); } if(document.getElementById("giftModal").style.display==="flex") document.getElementById("giftBalanceAmount").innerText=currentUser.coinsBalance; return true; }
+  function showGiftAnimation(giftIcon,receiverName){ const animDiv=document.createElement("div"); animDiv.className="gift-animation"; animDiv.innerHTML=giftIcon; document.body.appendChild(animDiv); setTimeout(()=>{ animDiv.remove(); },1000); }
+  function rechargeCoins(amount){ if(!currentUser) return; let users=getAllUsers(); const idx=users.findIndex(u=>u.id===currentUser.id); if(idx!==-1){ users[idx].coinsBalance+=amount; users[idx].totalCoinsPurchased+=amount; saveUsers(users); refreshCurrentUser(); alert(`✅ تم شحن ${amount} كوين بنجاح! رصيدك الآن ${currentUser.coinsBalance} كوين.`); if(document.getElementById("profileView").style.display==="block") updateProfileDisplay(); if(document.getElementById("leaderboardView").style.display==="block"){ const activeTab=document.querySelector(".lb-tab.active"); if(activeTab) renderLeaderboardTab(activeTab.getAttribute("data-lbtab")); } if(document.getElementById("giftModal").style.display==="flex") document.getElementById("giftBalanceAmount").innerText=currentUser.coinsBalance; } }
+  // ========== نظام تسجيل الدخول ==========
+  let pendingSignupData=null;
+  function showLoginScreen(){ document.getElementById("profileCompletionScreen").style.display="none"; document.getElementById("authScreen").style.display="flex"; document.getElementById("authTitle").innerText="🔐 تسجيل الدخول"; document.getElementById("authSubmitBtn").innerText="دخول"; document.getElementById("toggleAuthMode").innerText="إنشاء حساب جديد"; document.getElementById("authError").innerText=""; }
+  function showSignup(){ document.getElementById("authTitle").innerText="📝 إنشاء حساب"; document.getElementById("authSubmitBtn").innerText="إنشاء حساب"; document.getElementById("toggleAuthMode").innerText="لدي حساب بالفعل"; document.getElementById("authError").innerText=""; }
+  function handleAuth(){ const email=document.getElementById("authEmail").value.trim(); const password=document.getElementById("authPassword").value.trim(); const isLogin=document.getElementById("authTitle").innerText.includes("تسجيل الدخول"); const users=getAllUsers(); const errorDiv=document.getElementById("authError"); if(!email||!password){ errorDiv.innerText="❌ يرجى ملء جميع الحقول"; return; } if(isLogin){ const user=users.find(u=>u.email===email&&u.password===password); if(user){ currentUser={...user}; document.getElementById("authScreen").style.display="none"; document.getElementById("mainApp").style.display="block"; renderRooms("all"); updateBannerVisibility(); startSlider(); goHome(); updateRequestsBadge(); } else { errorDiv.innerText="❌ البريد الإلكتروني أو كلمة المرور غير صحيحة"; } } else { if(users.find(u=>u.email===email)){ errorDiv.innerText="❌ البريد الإلكتروني موجود مسبقاً"; return; } pendingSignupData={email,password}; showProfileCompletion(); } }
+  function showProfileCompletion(){ document.getElementById("authScreen").style.display="none"; const completionScreen=document.getElementById("profileCompletionScreen"); completionScreen.style.display="flex"; document.getElementById("completionUsername").value=""; const avatarGrid=document.getElementById("avatarGrid"); avatarGrid.innerHTML=""; avatars.forEach(emoji=>{ const div=document.createElement("div"); div.className="avatar-option"; div.innerText=emoji; div.onclick=()=>{ document.querySelectorAll("#avatarGrid .avatar-option").forEach(opt=>opt.classList.remove("selected")); div.classList.add("selected"); }; avatarGrid.appendChild(div); }); if(avatarGrid.firstChild) avatarGrid.firstChild.classList.add("selected"); const countrySelect=document.getElementById("completionCountry"); countrySelect.innerHTML=""; countries.forEach(country=>{ const option=document.createElement("option"); option.value=JSON.stringify(country); option.innerHTML=`${country.flag} ${country.name} (${country.code})`; countrySelect.appendChild(option); }); countrySelect.onchange=()=>{ const selected=JSON.parse(countrySelect.value); document.getElementById("selectedFlag").innerText=selected.flag; }; document.getElementById("selectedFlag").innerText=countries[0].flag; document.querySelectorAll("#profileCompletionScreen .gender-option").forEach(opt=>{ opt.onclick=()=>{ document.querySelectorAll("#profileCompletionScreen .gender-option").forEach(o=>o.classList.remove("selected")); opt.classList.add("selected"); }; }); if(document.querySelector("#profileCompletionScreen .gender-option")) document.querySelector("#profileCompletionScreen .gender-option").classList.add("selected"); document.getElementById("completionError").innerText=""; }
+  function completeProfile(){ const username=document.getElementById("completionUsername").value.trim(); if(!username){ document.getElementById("completionError").innerText="❌ يرجى إدخال اسم المستخدم"; return; } const users=getAllUsers(); if(users.find(u=>u.username===username&&u.email!==pendingSignupData.email)){ document.getElementById("completionError").innerText="❌ اسم المستخدم موجود مسبقاً"; return; } const selectedAvatar=document.querySelector("#avatarGrid .avatar-option.selected")?.innerText||"🌟"; const bio=document.getElementById("completionBio").value.trim(); const birthDate=document.getElementById("completionBirthDate").value; if(!birthDate){ document.getElementById("completionError").innerText="❌ يرجى إدخال تاريخ الميلاد"; return; } const countryData=JSON.parse(document.getElementById("completionCountry").value); const selectedGender=document.querySelector("#profileCompletionScreen .gender-option.selected")?.getAttribute("data-gender")||"male"; const newId="user_"+Date.now(); const newUserId=generateUnique7DigitId(); const newUser={id:newId,userId:newUserId,email:pendingSignupData.email,password:pendingSignupData.password,username,avatar:selectedAvatar,bio:bio||"",birthDate,countryCode:countryData.code,countryFlag:countryData.flag,countryName:countryData.name,gender:selectedGender,coinsBalance:500,totalCoinsSent:0,totalCoinsReceived:0,totalCoinsPurchased:0}; users.push(newUser); saveUsers(users); currentUser={...newUser}; document.getElementById("profileCompletionScreen").style.display="none"; document.getElementById("mainApp").style.display="block"; renderRooms("all"); updateBannerVisibility(); startSlider(); goHome(); updateRequestsBadge(); }
+  // ========== تعديل الملف الشخصي ==========
+  function openEditModal() { const modal = document.getElementById("editProfileModal"); document.getElementById("editUsername").value = currentUser.username; const editAvatarGrid = document.getElementById("editAvatarGrid"); editAvatarGrid.innerHTML = ""; avatars.forEach(emoji => { const div = document.createElement("div"); div.className = "avatar-option"; div.innerText = emoji; if (emoji === currentUser.avatar) div.classList.add("selected"); div.onclick = () => { document.querySelectorAll("#editAvatarGrid .avatar-option").forEach(opt => opt.classList.remove("selected")); div.classList.add("selected"); }; editAvatarGrid.appendChild(div); }); document.getElementById("editBio").value = currentUser.bio || ""; document.getElementById("editBirthDate").value = currentUser.birthDate || ""; const editCountrySelect = document.getElementById("editCountry"); editCountrySelect.innerHTML = ""; countries.forEach(country => { const option = document.createElement("option"); option.value = JSON.stringify(country); option.innerHTML = `${country.flag} ${country.name} (${country.code})`; if (country.code === currentUser.countryCode) option.selected = true; editCountrySelect.appendChild(option); }); editCountrySelect.onchange = () => { const selected = JSON.parse(editCountrySelect.value); document.getElementById("editSelectedFlag").innerText = selected.flag; }; document.getElementById("editSelectedFlag").innerText = currentUser.countryFlag || countries[0].flag; document.querySelectorAll("#editProfileModal .gender-option").forEach(opt => { opt.classList.remove("selected"); if (opt.getAttribute("data-gender") === currentUser.gender) opt.classList.add("selected"); opt.onclick = () => { document.querySelectorAll("#editProfileModal .gender-option").forEach(o => o.classList.remove("selected")); opt.classList.add("selected"); }; }); modal.style.display = "flex"; }
+  function closeEditModal() { document.getElementById("editProfileModal").style.display = "none"; }
+  function saveProfileChanges() { const newUsername = document.getElementById("editUsername").value.trim(); if (!newUsername) { document.getElementById("editError").innerText = "❌ اسم المستخدم مطلوب"; return; } const users = getAllUsers(); if (users.find(u => u.username === newUsername && u.id !== currentUser.id)) { document.getElementById("editError").innerText = "❌ اسم المستخدم موجود مسبقاً"; return; } const newAvatar = document.querySelector("#editAvatarGrid .avatar-option.selected")?.innerText || "🌟"; const newBio = document.getElementById("editBio").value.trim(); const newBirthDate = document.getElementById("editBirthDate").value; const countryData = JSON.parse(document.getElementById("editCountry").value); const newGender = document.querySelector("#editProfileModal .gender-option.selected")?.getAttribute("data-gender") || "male"; const userIndex = users.findIndex(u => u.id === currentUser.id); if (userIndex !== -1) { users[userIndex].username = newUsername; users[userIndex].avatar = newAvatar; users[userIndex].bio = newBio; users[userIndex].birthDate = newBirthDate; users[userIndex].countryCode = countryData.code; users[userIndex].countryFlag = countryData.flag; users[userIndex].countryName = countryData.name; users[userIndex].gender = newGender; saveUsers(users); refreshCurrentUser(); updateProfileDisplay(); closeEditModal(); if (document.getElementById("roomView").style.display === "block") { const meIndex = currentUsersInRoom.findIndex(u => u.id === currentUser.id); if (meIndex !== -1) { currentUsersInRoom[meIndex].name = currentUser.username; currentUsersInRoom[meIndex].avatar = currentUser.avatar; renderMics(); } } if (document.getElementById("leaderboardView").style.display === "block") { const activeTab = document.querySelector(".lb-tab.active"); if (activeTab) renderLeaderboardTab(activeTab.getAttribute("data-lbtab")); } } }
+  function toggleAuthMode() { const isLogin = document.getElementById("authTitle").innerText.includes("تسجيل الدخول"); isLogin ? showSignup() : showLoginScreen(); }
+  // ========== إنشاء الغرفة ==========
+  function openCreateRoomModal() { if (!currentUser) return; const userRooms = getUserRooms(); const hasRoom = Object.values(userRooms).some(r => r.ownerId === currentUser.id); if (hasRoom) { alert("⚠️ لا يمكنك إنشاء أكثر من غرفة واحدة. يمكنك تعديل غرفتك الحالية."); return; } const modal = document.getElementById("createRoomModal"); const avatarGrid = document.getElementById("roomAvatarGrid"); avatarGrid.innerHTML = ""; avatars.forEach(emoji => { const div = document.createElement("div"); div.className = "avatar-option"; div.innerText = emoji; div.onclick = () => { document.querySelectorAll("#roomAvatarGrid .avatar-option").forEach(opt => opt.classList.remove("selected")); div.classList.add("selected"); }; avatarGrid.appendChild(div); }); if (avatarGrid.firstChild) avatarGrid.firstChild.classList.add("selected"); const countrySelect = document.getElementById("newRoomCountry"); countrySelect.innerHTML = ""; countries.forEach(country => { const option = document.createElement("option"); option.value = JSON.stringify(country); option.innerHTML = `${country.flag} ${country.name}`; countrySelect.appendChild(option); }); countrySelect.onchange = () => { const selected = JSON.parse(countrySelect.value); document.getElementById("newRoomSelectedFlag").innerText = selected.flag; }; document.getElementById("newRoomSelectedFlag").innerText = countries[0].flag; document.getElementById("newRoomName").value = ""; document.getElementById("newRoomBio").value = ""; document.getElementById("createRoomError").innerText = ""; modal.style.display = "flex"; }
+  function closeCreateRoomModal() { document.getElementById("createRoomModal").style.display = "none"; }
+  function createRoom() { const roomName = document.getElementById("newRoomName").value.trim(); if (!roomName) { document.getElementById("createRoomError").innerText = "❌ يرجى إدخال اسم الغرفة"; return; } const selectedAvatar = document.querySelector("#roomAvatarGrid .avatar-option.selected")?.innerText || "🎙️"; const bio = document.getElementById("newRoomBio").value.trim(); if (bio.length > 80) { document.getElementById("createRoomError").innerText = "❌ السيرة الذاتية لا تتجاوز 80 حرفاً"; return; } const countryData = JSON.parse(document.getElementById("newRoomCountry").value); const userRooms = getUserRooms(); const existing = Object.values(userRooms).some(r => r.name === roomName); if (existing) { document.getElementById("createRoomError").innerText = "❌ يوجد غرفة بهذا الاسم بالفعل"; return; } const roomId = generateRoomId(); const newRoom = { roomId: roomId, name: roomName, avatar: selectedAvatar, bio: bio, ownerId: currentUser.id, ownerUsername: currentUser.username, createdAt: Date.now(), members: [], countryCode: countryData.code, countryFlag: countryData.flag, countryName: countryData.name }; userRooms[roomId] = newRoom; saveUserRooms(userRooms); closeCreateRoomModal(); openRoom(roomId); }
+  function openEditRoomModal() { if (!currentRoomId || !currentRoomData || currentRoomData.ownerId !== currentUser.id) return; const modal = document.getElementById("editRoomModal"); document.getElementById("editRoomName").value = currentRoomData.name; const avatarGrid = document.getElementById("editRoomAvatarGrid"); avatarGrid.innerHTML = ""; avatars.forEach(emoji => { const div = document.createElement("div"); div.className = "avatar-option"; div.innerText = emoji; if (emoji === currentRoomData.avatar) div.classList.add("selected"); div.onclick = () => { document.querySelectorAll("#editRoomAvatarGrid .avatar-option").forEach(opt => opt.classList.remove("selected")); div.classList.add("selected"); }; avatarGrid.appendChild(div); }); document.getElementById("editRoomBio").value = currentRoomData.bio || ""; document.getElementById("editRoomError").innerText = ""; modal.style.display = "flex"; }
+  function closeEditRoomModal() { document.getElementById("editRoomModal").style.display = "none"; }
+  function saveRoomChanges() { const newName = document.getElementById("editRoomName").value.trim(); if (!newName) { document.getElementById("editRoomError").innerText = "❌ اسم الغرفة مطلوب"; return; } const newAvatar = document.querySelector("#editRoomAvatarGrid .avatar-option.selected")?.innerText || "🎙️"; const newBio = document.getElementById("editRoomBio").value.trim(); if (newBio.length > 80) { document.getElementById("editRoomError").innerText = "❌ السيرة الذاتية لا تتجاوز 80 حرفاً"; return; } const userRooms = getUserRooms(); const room = userRooms[currentRoomId]; if (!room || room.ownerId !== currentUser.id) { alert("غير مصرح لك بتعديل هذه الغرفة"); closeEditRoomModal(); return; } const duplicate = Object.values(userRooms).some(r => r.roomId !== currentRoomId && r.name === newName); if (duplicate) { document.getElementById("editRoomError").innerText = "❌ يوجد غرفة بهذا الاسم بالفعل"; return; } room.name = newName; room.avatar = newAvatar; room.bio = newBio; saveUserRooms(userRooms); closeEditRoomModal(); currentRoomData = room; document.getElementById("roomTitle").innerText = room.name; document.getElementById("roomAvatarDisplay").innerText = room.avatar; document.getElementById("roomBioDisplay").innerText = room.bio || "لا توجد سيرة ذاتية للغرفة"; }
+  function joinRoom(roomId, roomName) { if (!currentUser) return; const userRooms = getUserRooms(); const room = userRooms[roomId]; if (!room) return; if (room.ownerId === currentUser.id) { alert("أنت مالك هذه الغرفة"); return; } let joined = getUserJoinedRooms(); if (!joined[currentUser.id]) joined[currentUser.id] = []; if (joined[currentUser.id].includes(roomId)) { alert("أنت بالفعل عضو في هذه الغرفة"); return; } if (!room.members) room.members = []; if (!room.members.includes(currentUser.id)) { room.members.push(currentUser.id); saveUserRooms(userRooms); } joined[currentUser.id].push(roomId); saveUserJoinedRooms(joined); alert(`تم الانضمام إلى الغرفة ${room.name}`); if (currentRoomId === roomId) { openRoom(roomId); } renderRooms(document.querySelector(".tab.active")?.getAttribute("data-filter") || "all", ""); }
+  function isUserMemberOfRoom(roomId) { if (!currentUser) return false; const userRooms = getUserRooms(); const room = userRooms[roomId]; if (room && room.ownerId === currentUser.id) return true; const joined = getUserJoinedRooms(); return joined[currentUser.id] && joined[currentUser.id].includes(roomId); }
+  // ==================== دوال التطبيق الرئيسية ====================
+  let sliderInterval;
+  function startSlider() { if (sliderInterval) clearInterval(sliderInterval); const slider = document.getElementById("slider"); if (slider) { let idx = 0; sliderInterval = setInterval(() => { idx = (idx + 1) % 3; slider.style.transform = `translateX(-${idx * 100}%)`; }, 3500); } }
+  let currentUsersInRoom = [], currentRoomName = "", currentRoomId = "", currentRoomData = null, hostId = null, raisedHands = [], selectedReceiverId = null, selectedGiftPrice = null, selectedGiftIcon = null;
+  const staticRooms = [
+    { name: "🔥 دردشة حرة", type: "popular", membersCount: 34, countryFlag: "🇸🇦", countryName: "السعودية", createdAt: Date.now() - 30 * ONE_WEEK_MS },
+    { name: "🎮 بلاي ستيشن", type: "popular", membersCount: 28, countryFlag: "🇦🇪", countryName: "الإمارات", createdAt: Date.now() - 30 * ONE_WEEK_MS },
+    { name: "🎵 موسيقى هادئة", type: "new", membersCount: 12, countryFlag: "🇪🇬", countryName: "مصر", createdAt: Date.now() - 30 * ONE_WEEK_MS },
+    { name: "⚽ مباراة الليلة", type: "new", membersCount: 45, countryFlag: "🇶🇦", countryName: "قطر", createdAt: Date.now() - 30 * ONE_WEEK_MS },
+    { name: "☕ قهوة وسوالف", type: "my", membersCount: 19, countryFlag: "🇰🇼", countryName: "الكويت", createdAt: Date.now() - 30 * ONE_WEEK_MS },
+    { name: "💻 برمجة وتقنية", type: "new", membersCount: 23, countryFlag: "🇴🇲", countryName: "عمان", createdAt: Date.now() - 30 * ONE_WEEK_MS },
+    { name: "🎭 تمثيل وصوت", type: "popular", membersCount: 31, countryFlag: "🇲🇦", countryName: "المغرب", createdAt: Date.now() - 30 * ONE_WEEK_MS },
+    { name: "📚 كتب وثقافة", type: "my", membersCount: 8, countryFlag: "🇯🇴", countryName: "الأردن", createdAt: Date.now() - 30 * ONE_WEEK_MS }
+  ];
+  function getAllRooms() { const userRooms = getUserRooms(); const roomsList = [...staticRooms]; for (let roomId in userRooms) { const r = userRooms[roomId]; roomsList.push({ name: r.name, type: "my", membersCount: (r.members ? r.members.length : 0) + 1, isUserRoom: true, roomId: r.roomId, avatar: r.avatar, bio: r.bio, ownerId: r.ownerId, ownerUsername: r.ownerUsername, members: r.members || [], countryFlag: r.countryFlag || "🏳️", countryName: r.countryName || "غير محدد", createdAt: r.createdAt || Date.now() }); } return roomsList; }
+  function renderRoomCard(room, container) { const card = document.createElement("div"); card.className = "card"; const avatarBg = document.createElement("div"); avatarBg.className = "room-avatar-bg"; avatarBg.innerText = room.avatar || "🎙️"; card.appendChild(avatarBg); const footer = document.createElement("div"); footer.className = "room-footer"; const nameDiv = document.createElement("div"); nameDiv.className = "room-name"; nameDiv.innerText = room.name; footer.appendChild(nameDiv); const statsDiv = document.createElement("div"); statsDiv.className = "room-stats"; statsDiv.innerHTML = `<span class="online-dot"></span> ${room.membersCount || 0}`; footer.appendChild(statsDiv); const countryDiv = document.createElement("div"); countryDiv.className = "room-stats"; countryDiv.style.marginTop = "2px"; countryDiv.innerHTML = `<span class="room-country">${room.countryFlag || "🏳️"} ${room.countryName || ""}</span>`; footer.appendChild(countryDiv); if (room.roomId) { const idDiv = document.createElement("div"); idDiv.className = "room-id-small"; idDiv.innerText = `🆔 ${room.roomId}`; footer.appendChild(idDiv); } card.appendChild(footer); if (room.isUserRoom && room.ownerId !== currentUser.id && !isUserMemberOfRoom(room.roomId)) { const joinIcon = document.createElement("div"); joinIcon.className = "join-icon"; joinIcon.innerHTML = '<i class="fas fa-plus-circle"></i>'; joinIcon.onclick = (e) => { e.stopPropagation(); joinRoom(room.roomId, room.name); }; card.appendChild(joinIcon); } card.onclick = (e) => { if (!e.target.closest('.join-icon')) openRoom(room.roomId || room.name); }; container.appendChild(card); }
+  let currentPopularCountry = "🇸🇦"; let popularCountriesList = [];
+  function updatePopularFilterBar() { const allRooms = getAllRooms(); const countrySet = new Set(); allRooms.forEach(room => { if (room.countryFlag) countrySet.add(room.countryFlag); }); popularCountriesList = Array.from(countrySet); const filterBar = document.getElementById("popularFlagsBar"); if (!filterBar) return; filterBar.innerHTML = ""; popularCountriesList.forEach(flag => { const btn = document.createElement("div"); btn.className = `flag-filter-btn ${currentPopularCountry === flag ? 'active' : ''}`; btn.innerHTML = flag; btn.onclick = () => { currentPopularCountry = flag; updatePopularFilterBar(); renderRooms("popular"); }; filterBar.appendChild(btn); }); }
+  function renderRooms(filterType = "all", searchTerm = "") { const container = document.getElementById("roomsContainer"); if (!container) return; let popularBar = document.getElementById("popularFlagsBar"); if (filterType === "popular") { if (!popularBar) { popularBar = document.createElement("div"); popularBar.id = "popularFlagsBar"; popularBar.className = "flags-filter"; container.parentNode.insertBefore(popularBar, container); } updatePopularFilterBar(); } else { if (popularBar) popularBar.remove(); } if (searchTerm && searchTerm.trim() !== "") { const term = searchTerm.trim().toLowerCase(); const allRooms = getAllRooms(); const matchedRooms = allRooms.filter(room => room.name.toLowerCase().includes(term) || (room.roomId && room.roomId === term)); const users = getAllUsers(); const matchedUsers = users.filter(u => u.username.toLowerCase().includes(term) || u.userId === term); container.innerHTML = ""; if (matchedRooms.length > 0) { const roomsHeader = document.createElement("div"); roomsHeader.className = "search-results-divider"; roomsHeader.innerText = "🎙️ غرف"; container.appendChild(roomsHeader); matchedRooms.forEach(room => renderRoomCard(room, container)); } if (matchedUsers.length > 0) { const usersHeader = document.createElement("div"); usersHeader.className = "search-results-divider"; usersHeader.innerText = "👤 مستخدمين"; container.appendChild(usersHeader); matchedUsers.forEach(user => { const card = document.createElement("div"); card.className = "card"; const avatarBg = document.createElement("div"); avatarBg.className = "room-avatar-bg"; avatarBg.innerText = user.avatar; card.appendChild(avatarBg); const footer = document.createElement("div"); footer.className = "room-footer"; const nameDiv = document.createElement("div"); nameDiv.className = "room-name"; nameDiv.innerText = user.username; footer.appendChild(nameDiv); const statsDiv = document.createElement("div"); statsDiv.className = "room-stats"; statsDiv.innerHTML = `<span class="online-dot"></span> 🆔 ${user.userId}`; footer.appendChild(statsDiv); card.appendChild(footer); card.onclick = () => { goProfile(); }; container.appendChild(card); }); } if (matchedRooms.length === 0 && matchedUsers.length === 0) container.innerHTML = `<div class="no-results">🤷 لا توجد نتائج لـ "${term}"</div>`; return; } let allRooms = getAllRooms(); if (filterType === "my") { const myRooms = allRooms.filter(room => room.isUserRoom && room.ownerId === currentUser.id); const joinedRooms = allRooms.filter(room => room.isUserRoom && room.ownerId !== currentUser.id && isUserMemberOfRoom(room.roomId)); container.innerHTML = ""; if (myRooms.length > 0) { const myHeader = document.createElement("div"); myHeader.className = "rooms-header"; myHeader.innerText = "👑 غرفتي"; container.appendChild(myHeader); myRooms.forEach(room => renderRoomCard(room, container)); } if (joinedRooms.length > 0) { const joinedHeader = document.createElement("div"); joinedHeader.className = "rooms-header"; joinedHeader.innerText = "📌 الغرف المنضمة"; container.appendChild(joinedHeader); joinedRooms.forEach(room => renderRoomCard(room, container)); } if (myRooms.length === 0 && joinedRooms.length === 0) container.innerHTML = `<div class="no-results">🤷 لا توجد غرف</div>`; return; } else if (filterType === "popular") { let filtered = allRooms.filter(room => room.countryFlag === currentPopularCountry); container.innerHTML = ""; if (filtered.length === 0) container.innerHTML = `<div class="no-results">🤷 لا توجد غرف لهذه الدولة</div>`; else filtered.forEach(room => renderRoomCard(room, container)); return; } else if (filterType === "new") { const now = Date.now(); let filtered = allRooms.filter(room => (room.createdAt && (now - room.createdAt) < ONE_WEEK_MS)); container.innerHTML = ""; if (filtered.length === 0) container.innerHTML = `<div class="no-results">🤷 لا توجد غرف جديدة</div>`; else filtered.forEach(room => renderRoomCard(room, container)); return; } else { container.innerHTML = ""; allRooms.forEach(room => renderRoomCard(room, container)); } }
+  function openRoom(roomIdentifier) { const userRooms = getUserRooms(); let roomData = null; if (userRooms[roomIdentifier]) { roomData = userRooms[roomIdentifier]; currentRoomId = roomIdentifier; currentRoomName = roomData.name; currentRoomData = roomData; } else { const staticRoom = staticRooms.find(r => r.name === roomIdentifier); if (!staticRoom) return; currentRoomName = roomIdentifier; currentRoomId = null; currentRoomData = null; } document.getElementById("topBar").style.display = "none"; document.getElementById("bottomNav").style.display = "none"; document.getElementById("banner").style.display = "none"; document.getElementById("roomsContainer").style.display = "none"; document.getElementById("profileView").style.display = "none"; document.getElementById("leaderboardView").style.display = "none"; document.getElementById("privateChatView").style.display = "none"; document.getElementById("friendsManagementView").style.display = "none"; document.getElementById("roomView").style.display = "block"; if (currentRoomData) { document.getElementById("roomTitle").innerText = currentRoomData.name; document.getElementById("roomAvatarDisplay").innerText = currentRoomData.avatar; document.getElementById("roomBioDisplay").innerText = currentRoomData.bio || "لا توجد سيرة ذاتية للغرفة"; document.getElementById("roomIdDisplay").innerText = `🆔 ${currentRoomData.roomId}`; hostId = currentRoomData.ownerId; const editIcon = document.getElementById("roomEditIcon"); if (currentRoomData.ownerId === currentUser.id) editIcon.style.display = "inline-block"; else editIcon.style.display = "none"; const joinBtn = document.getElementById("joinRoomBtn"); if (currentRoomData.ownerId !== currentUser.id && !isUserMemberOfRoom(currentRoomId)) { joinBtn.style.display = "flex"; joinBtn.onclick = () => joinRoom(currentRoomId, currentRoomData.name); } else joinBtn.style.display = "none"; } else { document.getElementById("roomTitle").innerText = currentRoomName; document.getElementById("roomAvatarDisplay").innerText = "🎙️"; document.getElementById("roomBioDisplay").innerText = ""; document.getElementById("roomIdDisplay").innerText = ""; hostId = currentUser.id; document.getElementById("roomEditIcon").style.display = "none"; document.getElementById("joinRoomBtn").style.display = "none"; } currentUsersInRoom = []; raisedHands = []; const ownerName = currentRoomData ? (currentUser.id === hostId ? currentUser.username : (getAllUsers().find(u => u.id === hostId)?.username || "المضيف")) : currentUser.username; currentUsersInRoom.push({ id: hostId, name: ownerName, speaker: true, avatar: currentRoomData?.avatar || "👑", userId: hostId === currentUser.id ? currentUser.userId : null, isHost: true, isMember: true }); if (currentRoomData && currentRoomData.members) { const users = getAllUsers(); currentRoomData.members.forEach(mid => { if (mid !== hostId) { const member = users.find(u => u.id === mid); if (member) { currentUsersInRoom.push({ id: mid, name: member.username, speaker: false, avatar: member.avatar, userId: member.userId, isHost: false, isMember: true }); } } }); } const fakeNames = ["🎧 علي", "🎙️ سارة", "🔊 أحمد", "🎤 ليلى", "📢 عمر", "✨ نور", "⭐ كريم"]; for (let i = 0; i < 5; i++) { currentUsersInRoom.push({ id: `fake_${i}`, name: fakeNames[i % fakeNames.length] + (i+1), speaker: false, avatar: "🎭", userId: null, isHost: false, isMember: false }); } updateParticipantsCount(); renderMics(); const chatDiv = document.getElementById("chatMessages"); chatDiv.innerHTML = `<div class="message"><div class="message-bubble" style="background:rgba(100,100,140,0.3);">🔊 دخلت إلى غرفة ${currentRoomName}</div></div>`; document.getElementById("messageInput").value = ""; }
+  function updateParticipantsCount() { document.getElementById("participantsCountNum").innerText = currentUsersInRoom.length; }
+  function renderMics() { const container = document.getElementById("micsList"); if (!container) return; container.innerHTML = ""; currentUsersInRoom.forEach(user => { const isSpeaking = user.speaker; const card = document.createElement("div"); card.className = `mic-card ${isSpeaking ? "speaking" : ""}`; if (raisedHands.includes(user.id) && !user.speaker && (user.isHost || user.isMember)) { const handBadge = document.createElement("div"); handBadge.className = "raised-hand-badge"; handBadge.innerText = "✋"; card.appendChild(handBadge); } const actionsDiv = document.createElement("div"); actionsDiv.className = "mic-actions"; if (user.id !== currentUser.id) { const giftBtn = document.createElement("button"); giftBtn.className = "mic-btn gift"; giftBtn.innerText = "🎁 هدية"; giftBtn.onclick = (e) => { e.stopPropagation(); selectedReceiverId = user.id; openGiftModal(); }; actionsDiv.appendChild(giftBtn); } if (hostId === currentUser.id && user.id !== currentUser.id && !user.speaker && raisedHands.includes(user.id) && user.isMember) { const acceptBtn = document.createElement("button"); acceptBtn.className = "mic-btn accept"; acceptBtn.innerText = "✅ قبول"; acceptBtn.onclick = (e) => { e.stopPropagation(); acceptHand(user.id); }; actionsDiv.appendChild(acceptBtn); } if (hostId === currentUser.id && user.id !== currentUser.id && user.speaker) { const removeBtn = document.createElement("button"); removeBtn.className = "mic-btn remove"; removeBtn.innerText = "🔇 كتم"; removeBtn.onclick = (e) => { e.stopPropagation(); removeFromMic(user.id); }; actionsDiv.appendChild(removeBtn); } let badges = ""; if (user.isHost) badges = '<span class="host-badge">مضيف</span>'; else if (user.isMember) badges = '<span class="member-badge">عضو</span>'; card.innerHTML = `<div class="mic-avatar">${user.avatar}</div><div class="mic-name">${user.name} ${badges}</div>`; card.appendChild(actionsDiv); container.appendChild(card); }); }
+  function showParticipantsList() { const modal = document.getElementById("participantsModal"); const container = document.getElementById("participantsListContainer"); container.innerHTML = ""; currentUsersInRoom.forEach(user => { const div = document.createElement("div"); div.className = "participant-item"; let badges = ""; if (user.isHost) badges = '<span class="host-badge">مضيف</span>'; else if (user.isMember) badges = '<span class="member-badge">عضو</span>'; div.innerHTML = `<div class="participant-avatar">${user.avatar}</div><div class="participant-info"><div class="participant-name">${user.name} ${badges}</div><div class="participant-id">🆔 ${user.userId ? user.userId : "زائر"}</div><div class="participant-actions">${hostId === currentUser.id && user.id !== currentUser.id && !user.speaker && raisedHands.includes(user.id) && user.isMember ? `<button class="mic-btn accept" data-userid="${user.id}">✅ قبول</button>` : ''}${hostId === currentUser.id && user.id !== currentUser.id && user.speaker ? `<button class="mic-btn remove" data-userid="${user.id}">🔇 كتم</button>` : ''}</div></div>`; container.appendChild(div); }); document.querySelectorAll("#participantsListContainer .mic-btn.accept").forEach(btn => { btn.addEventListener("click", (e) => { acceptHand(btn.getAttribute("data-userid")); closeParticipantsModal(); }); }); document.querySelectorAll("#participantsListContainer .mic-btn.remove").forEach(btn => { btn.addEventListener("click", (e) => { removeFromMic(btn.getAttribute("data-userid")); closeParticipantsModal(); }); }); modal.style.display = "flex"; }
+  function closeParticipantsModal() { document.getElementById("participantsModal").style.display = "none"; }
+  function showMembersList() { if (!currentRoomData) return; const modal = document.getElementById("membersModal"); const container = document.getElementById("membersListContainer"); container.innerHTML = ""; const membersIds = [currentRoomData.ownerId, ...(currentRoomData.members || [])]; const uniqueMembers = [...new Set(membersIds)]; const users = getAllUsers(); uniqueMembers.forEach(mid => { const user = users.find(u => u.id === mid); if (user) { const div = document.createElement("div"); div.className = "participant-item"; div.innerHTML = `<div class="participant-avatar">${user.avatar}</div><div class="participant-info"><div class="participant-name">${user.username} ${mid === currentRoomData.ownerId ? '<span class="host-badge">مضيف</span>' : '<span class="member-badge">عضو</span>'}</div><div class="participant-id">🆔 ${user.userId}</div></div>`; container.appendChild(div); } }); modal.style.display = "flex"; }
+  function closeMembersModal() { document.getElementById("membersModal").style.display = "none"; }
+  function raiseHand() { if (!currentUser) return; const userInRoom = currentUsersInRoom.find(u => u.id === currentUser.id); if (!userInRoom) return; if (!userInRoom.isMember && !userInRoom.isHost) { addChatMessage("system", "❌ لا يمكنك رفع يدك لأنك لست عضواً في هذه الغرفة. انضم أولاً.", ""); return; } if (userInRoom.speaker) { addChatMessage("system", "🎤 أنت بالفعل على الميكروفون!", ""); return; } if (raisedHands.includes(currentUser.id)) { addChatMessage("system", "✋ لديك طلب مسبق, انتظر قبول المضيف", ""); return; } raisedHands.push(currentUser.id); addChatMessage("system", `✋ ${currentUser.username} يرفع يده للصعود على الميكروفون`, ""); renderMics(); }
+  function acceptHand(userId) { if (hostId !== currentUser.id) { addChatMessage("system", "❌ فقط المضيف يمكنه قبول الطلبات", ""); return; } const userIndex = currentUsersInRoom.findIndex(u => u.id === userId); if (userIndex === -1) return; if (!currentUsersInRoom[userIndex].isMember) { addChatMessage("system", "❌ لا يمكن قبول طلب غير العضو", ""); return; } currentUsersInRoom[userIndex].speaker = true; raisedHands = raisedHands.filter(id => id !== userId); addChatMessage("system", `🎤 تم قبول ${currentUsersInRoom[userIndex].name} على الميكروفون`, ""); renderMics(); }
+  function removeFromMic(userId) { if (hostId !== currentUser.id) return; const userIndex = currentUsersInRoom.findIndex(u => u.id === userId); if (userIndex === -1) return; currentUsersInRoom[userIndex].speaker = false; addChatMessage("system", `🔇 تم كتم ${currentUsersInRoom[userIndex].name}`, ""); renderMics(); }
+  function toggleMyMic() { const me = currentUsersInRoom.find(u => u.id === currentUser.id); if (!me) return; if (!me.isMember && !me.isHost) { addChatMessage("system", "❌ لا يمكنك استخدام الميكروفون لأنك لست عضواً في هذه الغرفة. انضم أولاً.", ""); return; } if (me.speaker) { me.speaker = false; addChatMessage("system", "🔇 غادرت الميكروفون", ""); } else { if (hostId === currentUser.id) { me.speaker = true; addChatMessage("system", "🎤 صعدت على الميكروفون", ""); } else { addChatMessage("system", "✋ قم برفع يدك أولاً ليتم قبولك", ""); return; } } renderMics(); }
+  function openGiftModal() { if (!currentUser) return; const modal = document.getElementById("giftModal"); document.getElementById("giftBalanceAmount").innerText = currentUser.coinsBalance; const giftContainer = document.getElementById("giftItemsContainer"); giftContainer.innerHTML = ""; gifts.forEach((gift) => { const giftDiv = document.createElement("div"); giftDiv.className = "gift-item"; giftDiv.setAttribute("data-price", gift.price); giftDiv.setAttribute("data-icon", gift.icon); giftDiv.innerHTML = `<div class="gift-icon">${gift.icon}</div><div class="gift-name">${gift.name}</div><div class="gift-price">${gift.price} كوين</div>`; giftDiv.onclick = () => { document.querySelectorAll("#giftItemsContainer .gift-item").forEach(g => g.style.border = "1px solid rgba(255,215,0,0.3)"); giftDiv.style.border = "2px solid var(--gold)"; selectedGiftPrice = gift.price; selectedGiftIcon = gift.icon; }; giftContainer.appendChild(giftDiv); }); const recipientSelect = document.getElementById("giftRecipientSelect"); recipientSelect.innerHTML = '<option value="">اختر المستلم</option>'; currentUsersInRoom.forEach(user => { if (user.id !== currentUser.id) { const option = document.createElement("option"); option.value = user.id; option.textContent = `${user.name} (${user.userId || "زائر"})`; recipientSelect.appendChild(option); } }); modal.style.display = "flex"; }
+  function closeGiftModal() { document.getElementById("giftModal").style.display = "none"; selectedGiftPrice = null; selectedGiftIcon = null; }
+  function sendGiftFromModal() { if (!selectedGiftPrice) { alert("يرجى اختيار هدية أولاً"); return; } const recipientId = document.getElementById("giftRecipientSelect").value; if (!recipientId) { alert("يرجى اختيار مستلم"); return; } const receiver = currentUsersInRoom.find(u => u.id === recipientId); if (!receiver) return; sendCoinsToUser(recipientId, selectedGiftPrice, currentRoomName, selectedGiftIcon); closeGiftModal(); }
+  function leaveRoom() { goHome(); }
+  function addChatMessage(type, text, userName) { const chatDiv = document.getElementById("chatMessages"); const msgDiv = document.createElement("div"); msgDiv.className = "message"; if (type === "system") { msgDiv.innerHTML = `<div class="message-bubble" style="background:rgba(100,100,140,0.3);"><i class="fas fa-info-circle"></i> ${text}</div>`; } else if (type === "gift") { msgDiv.innerHTML = `<div class="message-bubble message-gift"><i class="fas fa-gift"></i> ${text}</div>`; } else { msgDiv.innerHTML = `<div class="message-avatar">${currentUser.avatar}</div><div class="message-bubble"><span class="message-user">${userName}:</span> ${text}</div>`; } chatDiv.appendChild(msgDiv); msgDiv.scrollIntoView({ behavior: "smooth", block: "nearest" }); }
+  function sendMsg() { const msg = document.getElementById("messageInput").value.trim(); if (!msg) return; addChatMessage("user", msg, currentUser.username); document.getElementById("messageInput").value = ""; }
+  function goHome() { document.getElementById("profileView").style.display = "none"; document.getElementById("roomView").style.display = "none"; document.getElementById("leaderboardView").style.display = "none"; document.getElementById("privateChatView").style.display = "none"; document.getElementById("friendsManagementView").style.display = "none"; document.getElementById("banner").style.display = "block"; document.getElementById("roomsContainer").style.display = "grid"; document.getElementById("topBar").style.display = "flex"; document.getElementById("bottomNav").style.display = "flex"; renderRooms(document.querySelector(".tab.active")?.getAttribute("data-filter") || "all", ""); updateBannerVisibility(); document.getElementById("navHome").classList.add("active"); document.getElementById("navChat").classList.remove("active"); document.getElementById("navProfile").classList.remove("active"); }
+  function goProfile() { document.getElementById("banner").style.display = "none"; document.getElementById("roomsContainer").style.display = "none"; document.getElementById("roomView").style.display = "none"; document.getElementById("leaderboardView").style.display = "none"; document.getElementById("privateChatView").style.display = "none"; document.getElementById("friendsManagementView").style.display = "none"; document.getElementById("profileView").style.display = "block"; document.getElementById("topBar").style.display = "flex"; document.getElementById("bottomNav").style.display = "flex"; updateProfileDisplay(); document.getElementById("navProfile").classList.add("active"); document.getElementById("navHome").classList.remove("active"); document.getElementById("navChat").classList.remove("active"); }
+  function goPrivateChat() { document.getElementById("banner").style.display = "none"; document.getElementById("roomsContainer").style.display = "none"; document.getElementById("roomView").style.display = "none"; document.getElementById("profileView").style.display = "none"; document.getElementById("leaderboardView").style.display = "none"; document.getElementById("friendsManagementView").style.display = "none"; document.getElementById("privateChatView").style.display = "block"; document.getElementById("topBar").style.display = "flex"; document.getElementById("bottomNav").style.display = "flex"; renderConversationsList(); closeChatView(); document.getElementById("navChat").classList.add("active"); document.getElementById("navHome").classList.remove("active"); document.getElementById("navProfile").classList.remove("active"); updateRequestsBadge(); }
+  function updateBannerVisibility() { const activeTab = document.querySelector(".tab.active"); const isAll = activeTab && activeTab.getAttribute("data-filter") === "all"; document.getElementById("banner").style.display = isAll ? "block" : "none"; }
+  function filterRooms(type, el) { document.querySelectorAll(".tab").forEach(t => t.classList.remove("active")); el.classList.add("active"); renderRooms(type, ""); updateBannerVisibility(); }
+  function openSearchOverlay() { const overlay = document.getElementById("searchOverlay"); overlay.style.display = "flex"; document.getElementById("searchOverlayInput").focus(); }
+  function closeSearchOverlay() { const overlay = document.getElementById("searchOverlay"); overlay.style.display = "none"; const active = document.querySelector(".tab.active"); renderRooms(active?.getAttribute("data-filter") || "all", ""); updateBannerVisibility(); }
+  document.getElementById("searchOverlayInput")?.addEventListener("input", (e) => { const term = e.target.value; const active = document.querySelector(".tab.active"); if (term.trim() !== "") { renderRooms(active?.getAttribute("data-filter") || "all", term); document.getElementById("banner").style.display = "none"; } else { renderRooms(active?.getAttribute("data-filter") || "all", ""); updateBannerVisibility(); } });
+  // ==================== لوحة المتصدرين ====================
+  function renderLeaderboardTab(tabId) { const container = document.getElementById("leaderboardContent"); if (!container) return; container.innerHTML = ""; const users = getAllUsers(); if (tabId === "rank") { const sorted = [...users].sort((a, b) => b.coinsBalance - a.coinsBalance); sorted.forEach((u, idx) => addLeaderboardItem(container, idx + 1, u.avatar, u.username, u.userId, `🪙 ${u.coinsBalance.toLocaleString()} كوين`)); } else if (tabId === "send") { const sorted = [...users].sort((a, b) => b.totalCoinsSent - a.totalCoinsSent); sorted.forEach((u, idx) => addLeaderboardItem(container, idx + 1, u.avatar, u.username, u.userId, `🎁 ${u.totalCoinsSent.toLocaleString()} كوين مرسلة`)); } else if (tabId === "receive") { const sorted = [...users].sort((a, b) => b.totalCoinsReceived - a.totalCoinsReceived); sorted.forEach((u, idx) => addLeaderboardItem(container, idx + 1, u.avatar, u.username, u.userId, `📦 ${u.totalCoinsReceived.toLocaleString()} كوين مستلمة`)); } else if (tabId === "rooms") { const roomsCoins = getRoomsCoins(); const roomsArray = Object.entries(roomsCoins).map(([name, coins]) => ({ name, coins })); roomsArray.sort((a, b) => b.coins - a.coins); roomsArray.forEach((room, idx) => { const medal = idx === 0 ? "🥇" : idx === 1 ? "🥈" : idx === 2 ? "🥉" : `#${idx + 1}`; const item = document.createElement("div"); item.className = "leaderboard-item"; item.innerHTML = `<div class="rank-icon">${medal}</div><div class="user-avatar">🏠</div><div class="user-info"><div class="user-name">${room.name}</div><div class="user-points">💎 <span>${room.coins}</span> كوين مرسلة في الغرفة</div></div>`; container.appendChild(item); }); } else if (tabId === "charge") { const sorted = [...users].sort((a, b) => b.totalCoinsPurchased - a.totalCoinsPurchased); sorted.forEach((u, idx) => addLeaderboardItem(container, idx + 1, u.avatar, u.username, u.userId, `💎 ${u.totalCoinsPurchased.toLocaleString()} كوين مشحونة`)); } }
+  function addLeaderboardItem(container, rank, avatar, name, userId, pointsText) { let rankIcon = rank === 1 ? "🥇" : rank === 2 ? "🥈" : rank === 3 ? "🥉" : `#${rank}`; let rankClass = rank === 1 ? "rank-1" : rank === 2 ? "rank-2" : rank === 3 ? "rank-3" : ""; const item = document.createElement("div"); item.className = "leaderboard-item"; item.innerHTML = `<div class="rank-icon ${rankClass}">${rankIcon}</div><div class="user-avatar">${avatar}</div><div class="user-info"><div class="user-name">${name}<span class="user-id-leaderboard">${userId}</span></div><div class="user-points">${pointsText}</div></div>`; container.appendChild(item); }
+  function initLeaderboardTabs() { document.querySelectorAll(".lb-tab").forEach(tab => { tab.addEventListener("click", () => { document.querySelectorAll(".lb-tab").forEach(t => t.classList.remove("active")); tab.classList.add("active"); renderLeaderboardTab(tab.getAttribute("data-lbtab")); }); }); renderLeaderboardTab("rank"); }
+  function showLeaderboard() { document.getElementById("banner").style.display = "none"; document.getElementById("roomsContainer").style.display = "none"; document.getElementById("roomView").style.display = "none"; document.getElementById("profileView").style.display = "none"; document.getElementById("privateChatView").style.display = "none"; document.getElementById("friendsManagementView").style.display = "none"; document.getElementById("leaderboardView").style.display = "block"; document.getElementById("topBar").style.display = "flex"; document.getElementById("bottomNav").style.display = "flex"; initLeaderboardTabs(); document.getElementById("navHome").classList.remove("active"); document.getElementById("navChat").classList.remove("active"); document.getElementById("navProfile").classList.remove("active"); }
+  function openRechargeModal() { const modal = document.getElementById("rechargeModal"); const container = document.getElementById("packagesContainer"); const packages = [{ coins: 100, price: "4.99" }, { coins: 500, price: "19.99" }, { coins: 1200, price: "44.99" }, { coins: 3000, price: "99.99" }]; container.innerHTML = ""; document.getElementById("rechargeBalanceDisplay").innerText = currentUser.coinsBalance; packages.forEach(p => { const card = document.createElement("div"); card.className = "package-card"; card.innerHTML = `<div class="package-price">${p.price} $</div><div class="package-coins">💰 ${p.coins} كوين</div>`; card.onclick = () => { rechargeCoins(p.coins); closeRechargeModal(); }; container.appendChild(card); }); modal.style.display = "flex"; }
+  function closeRechargeModal() { document.getElementById("rechargeModal").style.display = "none"; }
+  function logout() { currentUser = null; document.getElementById("mainApp").style.display = "none"; document.getElementById("authScreen").style.display = "flex"; document.getElementById("authTitle").innerText = "🔐 تسجيل الدخول"; document.getElementById("authSubmitBtn").innerText = "دخول"; document.getElementById("toggleAuthMode").innerText = "إنشاء حساب جديد"; document.getElementById("authError").innerText = ""; }
+  // ربط الأزرار
+  document.getElementById("micToggleBtn")?.addEventListener("click", toggleMyMic);
+  document.getElementById("raiseHandBtn")?.addEventListener("click", raiseHand);
+  document.getElementById("leaveRoomBtn")?.addEventListener("click", leaveRoom);
+  document.getElementById("sendGiftConfirmBtn")?.addEventListener("click", sendGiftFromModal);
+  document.getElementById("confirmCreateRoomBtn")?.addEventListener("click", createRoom);
+  document.getElementById("saveRoomChangesBtn")?.addEventListener("click", saveRoomChanges);
+  window.joinMic = toggleMyMic;
+  window.leaveMic = () => { const me = currentUsersInRoom.find(u => u.id === currentUser.id); if (me && me.speaker) { me.speaker = false; renderMics(); addChatMessage("system", "🔇 غادرت الميكروفون", ""); } };
+  window.addUser = () => { const newId = "u" + Date.now(); const fakeNames = ["جديد✨", "زائر🎧", "مستمع🎵"]; const newName = fakeNames[Math.floor(Math.random() * fakeNames.length)]; currentUsersInRoom.push({ id: newId, name: newName, speaker: false, avatar: "👤", userId: null, isHost: false, isMember: false }); updateParticipantsCount(); renderMics(); addChatMessage("system", `➕ انضم ${newName} إلى الغرفة`, ""); };
+  window.sendMsg = sendMsg;
+  window.goHome = goHome;
+  window.goProfile = goProfile;
+  window.goPrivateChat = goPrivateChat;
+  window.filterRooms = filterRooms;
+  window.openRoom = openRoom;
+  window.showLeaderboard = showLeaderboard;
+  window.rechargeCoins = rechargeCoins;
+  window.sendCoinsToUser = sendCoinsToUser;
+  window.openRechargeModal = openRechargeModal;
+  window.closeRechargeModal = closeRechargeModal;
+  window.showLoginScreen = showLoginScreen;
+  window.openEditModal = openEditModal;
+  window.closeEditModal = closeEditModal;
+  window.saveProfileChanges = saveProfileChanges;
+  window.showParticipantsList = showParticipantsList;
+  window.closeParticipantsModal = closeParticipantsModal;
+  window.showMembersList = showMembersList;
+  window.closeMembersModal = closeMembersModal;
+  window.openCreateRoomModal = openCreateRoomModal;
+  window.closeCreateRoomModal = closeCreateRoomModal;
+  window.openEditRoomModal = openEditRoomModal;
+  window.closeEditRoomModal = closeEditRoomModal;
+  window.openSearchOverlay = openSearchOverlay;
+  window.closeSearchOverlay = closeSearchOverlay;
+  window.openGiftModal = openGiftModal;
+  window.closeGiftModal = closeGiftModal;
+  window.logout = logout;
+  window.joinRoom = joinRoom;
+  window.showFriendsManagement = showFriendsManagement;
+  window.goBackToChat = goBackToChat;
+  window.deleteFriendUI = deleteFriendUI;
+  window.showFriendRequestsModal = showFriendRequestsModal;
+  window.closeFriendRequestsModal = closeFriendRequestsModal;
+  window.acceptFriendRequestFromModal = acceptFriendRequestFromModal;
+  window.rejectFriendRequestFromModal = rejectFriendRequestFromModal;
+  window.sendPrivateMessage = sendPrivateMessage;
+  window.closeChatView = closeChatView;
+  window.openSearchFriendsModal = openSearchFriendsModal;
+  window.closeSearchFriendsModal = closeSearchFriendsModal;
+  window.sendFriendRequestFromModal = sendFriendRequestFromModal;
+  window.deleteMessage = deleteMessage;
+  window.clearConversation = clearConversation;
+  document.getElementById("toggleAuthMode")?.addEventListener("click", toggleAuthMode);
+  document.getElementById("authSubmitBtn")?.addEventListener("click", handleAuth);
+  document.getElementById("completeProfileBtn")?.addEventListener("click", completeProfile);
+  document.getElementById("saveProfileBtn")?.addEventListener("click", saveProfileChanges);
+  initDatabase();
+  document.getElementById("authScreen").style.display = "flex";
+</script>
+</body>
+</html>
